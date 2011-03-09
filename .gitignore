@@ -1,2 +1,12 @@
+*.pyc
+*.pyo
 .project
 .pydevproject
+.installed.cfg
+.mr.developer.cfg
+bin/
+develop-eggs/
+devsrc/
+eggs/
+parts/
+src/cone.mdb.egg-info/
