@@ -7,5 +7,4 @@ registerTile('content',
              'cone.app:browser/templates/listing.pt',
              interface=Repositories,
              class_=ProtectedContentTile,
-             permission='login',
-             strict=False)
+             permission='login')

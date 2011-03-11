@@ -1,5 +1,6 @@
 import os
 import re
+from plumber import plumber
 from pyramid.security import authenticated_userid
 from yafowil.base import (
     factory,
@@ -12,8 +13,9 @@ from cone.tile import (
 from cone.app.browser.utils import make_url
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import (
-    AddForm,
-    EditForm,
+    Form,
+    AddPart,
+    EditPart,
 )
 from node.ext.mdb import Repository
 from cone.mdb.model import RepositoryAdapter
@@ -30,7 +32,6 @@ registerTile('content',
 
 class RepositoryForm(object):
     
-    @property
     def prepare(self):
         resource='add'
         if self.model.__name__ is not None:
@@ -93,8 +94,10 @@ class RepositoryForm(object):
         return id
 
 
-@tile('addform', interface=RepositoryAdapter, permission="view")
-class RepositoryAddForm(RepositoryForm, AddForm):
+@tile('addform', interface=RepositoryAdapter, permission="add")
+class RepositoryAddForm(RepositoryForm, Form):
+    __metaclass__ = plumber
+    __plumbing__ = AddPart
     
     def save(self, widget, data):
         db = Repository(os.path.join(self.model.__parent__.dbpath,
@@ -109,8 +112,10 @@ class RepositoryAddForm(RepositoryForm, AddForm):
         repository()
 
 
-@tile('editform', interface=RepositoryAdapter, permission="view")
-class RepositoryEditForm(RepositoryForm, EditForm):
+@tile('editform', interface=RepositoryAdapter, permission="edit")
+class RepositoryEditForm(RepositoryForm, Form):
+    __metaclass__ = plumber
+    __plumbing__ = EditPart
     
     def save(self, widget, data):
         metadata = self.model.metadata

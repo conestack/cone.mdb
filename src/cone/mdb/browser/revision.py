@@ -1,9 +1,10 @@
 import uuid
 import datetime
 from webob import Response
+from plumber import plumber
 from zope.component import queryUtility
 from pyramid.interfaces import IResponseFactory
-from pyramid.view import bfg_view
+from pyramid.view import view_config
 from yafowil.base import (
     factory,
     ExtractionError,
@@ -22,8 +23,9 @@ from cone.app.browser.utils import (
 )
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import (
-    AddForm,
-    EditForm,
+    Form,
+    AddPart,
+    EditPart,
 )
 from node.ext.mdb import (
     Revision,
@@ -61,7 +63,7 @@ class RevisionDetails(Tile):
         return ret
 
 
-@bfg_view(name='download', for_=RevisionAdapter, permission='view')
+@view_config('download', for_=RevisionAdapter, permission='view')
 def download(model, request):
     response_factory = queryUtility(IResponseFactory, default=Response)
     response = response_factory(model.model['binary'].payload)
@@ -72,7 +74,6 @@ def download(model, request):
 
 class RevisionForm(object):
     
-    @property
     def prepare(self):
         metadata = self.model.metadata
         resource = self.adding and 'add' or 'edit'
@@ -309,8 +310,10 @@ registerTile('content',
              strict=False)
 
 
-@tile('addform', interface=RevisionAdapter, permission="view")
-class RevisionAddForm(RevisionForm, AddForm):
+@tile('addform', interface=RevisionAdapter, permission="add")
+class RevisionAddForm(RevisionForm, Form):
+    __metaclass__ = plumber
+    __plumbing__ = AddPart
     
     def save(self, widget, data):
         media = self.model.__parent__.model
@@ -347,8 +350,10 @@ class RevisionAddForm(RevisionForm, AddForm):
         self.index_metadata_in_solr(self.model.__parent__[key])
 
 
-@tile('editform', interface=RevisionAdapter, permission="view")
-class RevisionEditForm(RevisionForm, EditForm):
+@tile('editform', interface=RevisionAdapter, permission="edit")
+class RevisionEditForm(RevisionForm, Form):
+    __metaclass__ = plumber
+    __plumbing__ = EditPart
     
     def save(self, widget, data):
         metadata = self.model.metadata

@@ -31,16 +31,15 @@ registerTile('content',
              'cone.mdb:browser/templates/solr.pt',
              interface=Solr,
              class_=ProtectedContentTile,
-             permission='login',
-             strict=False)
+             permission='login')
 
 
-@tile('reindexform', interface=Solr, permission="view")
+@tile('reindexform', interface=Solr, permission="manage")
 class SolrReindexForm(Form):
     
     def prepare(self):
         form = factory(u'form',
-                       name='reindexform',
+                       name='solrreindexform',
                        props={'action': self.nodeurl})
         form['clear'] = factory(
             'field:label:checkbox',
@@ -70,14 +69,14 @@ class SolrReindexForm(Form):
         return HTTPFound(url)
 
 
-@tile('editform', interface=Solr, permission="view")
+@tile('editform', interface=Solr, permission="manage")
 class SolrSettingsForm(Form):
     __metaclass__ = plumber
     __plumbing__ = EditPart
     
     def prepare(self):
         form = factory(u'form',
-                       name='editform',
+                       name='solrform',
                        props={'action': self.nodeurl})
         form['server'] = factory(
             'field:label:error:text',

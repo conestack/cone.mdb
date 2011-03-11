@@ -16,18 +16,17 @@ registerTile('content',
              'cone.mdb:browser/templates/database.pt',
              interface=Database,
              class_=ProtectedContentTile,
-             permission='login',
-             strict=False)
+             permission='login')
 
 
-@tile('editform', interface=Database, permission="view")
+@tile('editform', interface=Database, permission="manage")
 class DatabaseSettingsForm(Form):
     __metaclass__ = plumber
     __plumbing__ = EditPart
     
     def prepare(self):
         form = factory(u'form',
-                       name='editform',
+                       name='databaseform',
                        props={'action': self.nodeurl})
         form['path'] = factory(
             'field:label:error:text',

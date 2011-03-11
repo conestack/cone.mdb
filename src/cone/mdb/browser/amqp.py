@@ -21,14 +21,14 @@ registerTile('content',
              strict=False)
 
 
-@tile('editform', interface=Amqp, permission="view")
+@tile('editform', interface=Amqp, permission="manage")
 class AmqpSettingsForm(Form):
     __metaclass__ = plumber
     __plumbing__ = EditPart
     
     def prepare(self):
         form = factory(u'form',
-                       name='editform',
+                       name='amqpform',
                        props={'action': self.nodeurl})
         form['host'] = factory(
             'field:label:error:text',

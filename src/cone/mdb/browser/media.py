@@ -1,4 +1,4 @@
-import uuid
+from plumber import plumber
 from pyramid.security import authenticated_userid
 from yafowil.base import factory
 from bda.basen import base62
@@ -9,8 +9,9 @@ from cone.tile import (
 from cone.app.browser.utils import make_url
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import (
-    AddForm,
-    EditForm,
+    Form,
+    AddPart,
+    EditPart,
 )
 from node.ext.mdb import (
     Media,
@@ -23,8 +24,7 @@ from cone.mdb.browser.utils import timestamp
 @tile('content',
       'templates/media.pt',
       interface=MediaAdapter,
-      permission='login',
-      strict=False)
+      permission='login')
 
 
 class MediaTile(ProtectedContentTile):
@@ -38,7 +38,6 @@ class MediaTile(ProtectedContentTile):
 
 class MediaForm(object):
     
-    @property
     def prepare(self):
         resource='add'
         if self.model.__name__ is not None:
@@ -83,8 +82,10 @@ class MediaForm(object):
         self.form = form
 
 
-@tile('addform', interface=MediaAdapter, permission="view")
-class MediaAddForm(MediaForm, AddForm):
+@tile('addform', interface=MediaAdapter, permission="add")
+class MediaAddForm(MediaForm, Form):
+    __metaclass__ = plumber
+    __plumbing__ = AddPart
     
     def save(self, widget, data):
         keys = MediaKeys(self.model.__parent__.model.__name__)
@@ -101,8 +102,10 @@ class MediaAddForm(MediaForm, AddForm):
         media()
 
 
-@tile('editform', interface=MediaAdapter, permission="view")
-class MediaEditForm(MediaForm, EditForm):
+@tile('editform', interface=MediaAdapter, permission="edit")
+class MediaEditForm(MediaForm, Form):
+    __metaclass__ = plumber
+    __plumbing__ = EditPart
     
     def save(self, widget, data):
         metadata = self.model.metadata
