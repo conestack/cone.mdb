@@ -1,5 +1,5 @@
 <tal:ajax xmlns:ajax="http://namesspaces.bluedynamics.eu/ajax" omit-tag="True">
-  <div tal:define="metadata model.metadata">
+  <div class="box" tal:define="metadata model.metadata">
     <h1 tal:content="model.metadata.title">Revision 0</h1>
     <tal:contents replace="structure tile('contextmenu')" />
     <tal:contents replace="structure tile('byline')" />

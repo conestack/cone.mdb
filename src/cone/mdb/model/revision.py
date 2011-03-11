@@ -13,7 +13,7 @@ class RevisionAdapter(AdapterNode):
     @property
     def properties(self):
         props = Properties()
-        props.in_navtree = False
+        props.in_navtree = True
         flag = self.metadata.flag
         props.editable = flag == 'draft' and True or False
         props.action_up = True

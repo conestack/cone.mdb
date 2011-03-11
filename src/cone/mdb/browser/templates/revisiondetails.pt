@@ -2,67 +2,69 @@
           omit-tag="True"
           define="metadata model.metadata">
     
-  <p tal:content="metadata.description">Description</p>
+  <div>
+    <p tal:content="metadata.description">Description</p>
     
-  <h3>Details</h3>
+    <h3>Details</h3>
     
-  <table class="revisiondetails">
-    <tr>
-      <td class="labelcol">Flag</td>
-      <td class="${metadata.flag}"
-          tal:content="metadata.flag">draft</td>
-    </tr>
-    <tr>
-      <td class="labelcol">Visibility</td>
-      <td class="${metadata.visibility}"
-          tal:content="metadata.visibility">hidden</td>
-    </tr>
-    <tr>
-      <td class="labelcol">Revision number</td>
-      <td tal:content="model.__name__">0</td>
-    </tr>
-    <tr>
-      <td class="labelcol">Revision UID</td>
-      <td tal:content="metadata.uid">UID</td>
-    </tr>
-    <tr>
-      <td class="labelcol">Document Author</td>
-      <td tal:content="metadata.author">Author</td>
-    </tr>
-    <tr tal:define="kw metadata.keywords;
-                    kw kw and ', '.join(kw) or ''">
-      <td class="labelcol">Keywords</td>
-      <td tal:content="kw">Keywords</td>
-    </tr>
-    <tr>
-      <td class="labelcol">Relations</td>
-      <td>
-        <ul>
-          <li tal:repeat="relation context.relations">
-            <a href="${relation.target}"
-               ajax:bind="click"
-               ajax:event="contextchanged:.contextsensitiv
-                           contextchanged:#content"
-               ajax:target="${relation.target}"
-               tal:content="relation.title">Title</a>
-          </li>
-        </ul>
-      </td>
-    </tr>
-    <tr>
-      <td class="labelcol">File</td>
-      <td>
-        <a href="${context.nodeurl}/download"
-           tal:content="metadata.filename">Filename</a>
-      </td>
-    </tr>
-    <tr>
-      <td class="labelcol">Mimetype</td>
-      <td tal:content="metadata.metatype">text/plain</td>
-    </tr>
-    <tr>
-      <td class="labelcol">Alttag</td>
-      <td tal:content="metadata.alttag">Foo</td>
-    </tr>
-  </table>
+    <table class="revisiondetails">
+      <tr>
+        <td class="labelcol">Flag</td>
+        <td class="${metadata.flag}"
+            tal:content="metadata.flag">draft</td>
+      </tr>
+      <tr>
+        <td class="labelcol">Visibility</td>
+        <td class="${metadata.visibility}"
+            tal:content="metadata.visibility">hidden</td>
+      </tr>
+      <tr>
+        <td class="labelcol">Revision number</td>
+        <td tal:content="model.__name__">0</td>
+      </tr>
+      <tr>
+        <td class="labelcol">Revision UID</td>
+        <td tal:content="metadata.uid">UID</td>
+      </tr>
+      <tr>
+        <td class="labelcol">Document Author</td>
+        <td tal:content="metadata.author">Author</td>
+      </tr>
+      <tr tal:define="kw metadata.keywords;
+                      kw kw and ', '.join(kw) or ''">
+        <td class="labelcol">Keywords</td>
+        <td tal:content="kw">Keywords</td>
+      </tr>
+      <tr>
+        <td class="labelcol">Relations</td>
+        <td>
+          <ul>
+            <li tal:repeat="relation context.relations">
+              <a href="${relation.target}"
+                 ajax:bind="click"
+                 ajax:event="contextchanged:.contextsensitiv
+                             contextchanged:#content"
+                 ajax:target="${relation.target}"
+                 tal:content="relation.title">Title</a>
+            </li>
+          </ul>
+        </td>
+      </tr>
+      <tr>
+        <td class="labelcol">File</td>
+        <td>
+          <a href="${context.nodeurl}/download"
+             tal:content="metadata.filename">Filename</a>
+        </td>
+      </tr>
+      <tr>
+        <td class="labelcol">Mimetype</td>
+        <td tal:content="metadata.metatype">text/plain</td>
+      </tr>
+      <tr>
+        <td class="labelcol">Alttag</td>
+        <td tal:content="metadata.alttag">Foo</td>
+      </tr>
+    </table>
+  </div>
 </tal:ajax>

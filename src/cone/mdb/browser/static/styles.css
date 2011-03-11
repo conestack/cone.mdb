@@ -7,32 +7,40 @@ ul#mainmenu li.node-repositories a.current_page_item {
     background:url('images/menu_repositories_selected.png') top left no-repeat;
 }
 
+/* forms with box background */
+#form-repositoryform,
+#form-mediaform,
+#form-revisionform {
+    background:url('/static/images/box.gif') top left no-repeat;
+    padding:12px;
+}
+
 /* Revision */
 .revisiondetails {
-	border-width:1px 1px 0px 1px;
-	border-color:#ccc;
-	border-style:solid;
-	border-collapse:collapse;
-	border-spacing:none;
+    border-width:1px 1px 0px 1px;
+    border-color:#ccc;
+    border-style:solid;
+    border-collapse:collapse;
+    border-spacing:none;
 }
 .revisiondetails td {
-	padding: 5px;
-	border-bottom:#ccc 1px solid;
+    padding: 5px;
+    border-bottom:#ccc 1px solid;
 }
 .revisiondetails td.labelcol {
-	font-weight:bold;
-	text-align:right;
-	border-right:#ccc 1px solid;
+    font-weight:bold;
+    text-align:right;
+    border-right:#ccc 1px solid;
 }
 .revisiondetails td ul {
-	list-style-type:none;
-	margin:0;
-	padding:0;
+    list-style-type:none;
+    margin:0;
+    padding:0;
 }
 .revisiondetails td ul li {
     list-style-image:none;
     margin: 0;
-	padding:0;
+    padding:0;
 }
 .revisiondetails .hidden {
     color:red;
@@ -41,7 +49,7 @@ ul#mainmenu li.node-repositories a.current_page_item {
     color:green;
 }
 .revisiondetails .draft {
-	color:orange;
+    color:orange;
 }
 .revisiondetails .active {
     color:green;

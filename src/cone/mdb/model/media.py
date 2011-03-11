@@ -16,7 +16,7 @@ class MediaAdapter(AdapterNode):
     @property
     def properties(self):
         props = Properties()
-        props.in_navtree = False
+        props.in_navtree = True
         props.editable = True
         props.action_up = True
         props.action_view = True
