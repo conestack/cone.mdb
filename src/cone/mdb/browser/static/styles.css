@@ -1,3 +1,12 @@
+
+/* main menu icon XXX: generic mechanism */
+ul#mainmenu li.node-repositories a {
+    background:url('images/menu_repositories.png') top left no-repeat;
+}
+ul#mainmenu li.node-repositories a.current_page_item {
+    background:url('images/menu_repositories_selected.png') top left no-repeat;
+}
+
 /* Revision */
 .revisiondetails {
 	border-width:1px 1px 0px 1px;
