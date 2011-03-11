@@ -1,0 +1,43 @@
+/* Revision */
+.revisiondetails {
+	border-width:1px 1px 0px 1px;
+	border-color:#ccc;
+	border-style:solid;
+	border-collapse:collapse;
+	border-spacing:none;
+}
+.revisiondetails td {
+	padding: 5px;
+	border-bottom:#ccc 1px solid;
+}
+.revisiondetails td.labelcol {
+	font-weight:bold;
+	text-align:right;
+	border-right:#ccc 1px solid;
+}
+.revisiondetails td ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+.revisiondetails td ul li {
+    list-style-image:none;
+    margin: 0;
+	padding:0;
+}
+.revisiondetails .hidden {
+    color:red;
+}
+.revisiondetails .anonymous {
+    color:green;
+}
+.revisiondetails .draft {
+	color:orange;
+}
+.revisiondetails .active {
+    color:green;
+}
+.revisiondetails .frozen {
+    color:red;
+}
+

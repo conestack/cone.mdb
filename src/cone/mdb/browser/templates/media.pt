@@ -1,0 +1,20 @@
+<tal:ajax xmlns:ajax="http://namesspaces.bluedynamics.eu/ajax" omit-tag="True">
+  <div tal:define="metadata model.metadata">
+    <h1 tal:content="model.metadata.title">Revision 0</h1>
+    <tal:contents replace="structure tile('contextmenu')" />
+    <tal:contents replace="structure tile('byline')" />
+    
+    <tal:active define="rev context.active_revision">
+      <tal:ref condition="rev">
+        <h1>Active revision</h1>
+        <tal:revision replace="structure rev" />
+      </tal:ref>
+      <tal:ref condition="not rev">
+        <div>
+          No active revision set.
+        </div>
+        <tal:contents replace="structure tile('contents')" />
+      </tal:ref>
+    </tal:active>
+  </div>
+</tal:ajax>

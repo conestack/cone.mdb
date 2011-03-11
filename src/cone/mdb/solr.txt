@@ -1,0 +1,192 @@
+Read/write interface for ``mdb`` to ``Lucene`` indexing server
+================================================================
+
+Test expected server behavior due to ``pysolr``
+-----------------------------------------------
+
+Print helper
+::
+
+    >>> def printres(res):
+    ...     for r in res:
+    ...         keys = r.keys()
+    ...         keys.sort()
+    ...         for key in keys:
+    ...             print '%s: %s' % (key, r[key])
+
+Create connection
+::
+
+    >>> from pysolr import Solr
+    >>> solr = Solr('http://localhost:8983/solr')
+    >>> solr
+    <pysolr.Solr object at ...>
+
+Delete all entries from solr
+::
+
+    >>> solr.delete(q='*:*')
+    >>> res = solr.search('solr')
+    >>> printres(res)
+
+Add test entry
+::
+
+    >>> from datetime import datetime
+    >>> entry = {
+    ...   'uid': '12345',
+    ...   'author': 'robi',
+    ...   'created': datetime.now(),
+    ...   'effective': datetime.now(),
+    ...   'expires': datetime.now(),
+    ...   'revision': 1.0,
+    ...   'metatype': 'text/plain',
+    ...   'creator': 'robi',
+    ...   'keywords': ['a', 'b', 'c'],
+    ...   'url': 'foo/bar/baz',
+    ...   'relations': ['54321', '13246'],
+    ...   'title': 'title',
+    ...   'description': 'description',
+    ...   'alttag': 'alttag',
+    ...   'body': ['body text 1', 'body text 2'],
+    ...   'flag': 'draft',
+    ...   'visibility': 'hidden',
+    ...   'path': '/bla/bla',
+    ...   'modified': datetime.now(),
+    ...   'filename': 'foo.txt',
+    ... }
+    >>> solr.add([entry])
+
+Query already added entry
+::
+
+    >>> res = solr.search('body text 1')
+    >>> printres(res)
+    alttag: alttag
+    author: robi
+    created: ...
+    creator: robi
+    description: description
+    effective: ...
+    expires: ...
+    flag: draft
+    keywords: ['a', 'b', 'c']
+    metatype: text/plain
+    modified: ...
+    path: /bla/bla
+    relations: ['54321', '13246']
+    revision: 1.0
+    title: title
+    uid: 12345
+    url: foo/bar/baz
+    visibility: hidden
+
+
+Now use API provided by ``cone.mdb.solr`` to manage indexed data
+-------------------------------------------------------
+
+Solr configuration
+::
+
+    >>> from cone.mdb.solr import Config
+    >>> config = Config()
+    >>> config.server = 'localhost'
+    >>> config.port = '8983'
+    >>> config.path = 'solr'
+
+The ``Metadata`` object
+::
+
+    >>> from cone.mdb.solr import Metadata
+
+Create Metadata with keywords
+::
+
+    >>> from cone.mdb.solr import Metadata
+    >>> md = Metadata(config, 
+    ...               uid='12346',
+    ...               author='robi1',
+    ...               created=datetime.now(),
+    ...               effective=datetime.now(),
+    ...               expires=datetime.now(),
+    ...               revision=1.1,
+    ...               metatype='text/plain',
+    ...               creator='robi1',
+    ...               keywords=['a', 'b'],
+    ...               url='foo/bar/baz1',
+    ...               relations=['13245'],
+    ...               title='title1',
+    ...               description='description1',
+    ...               alttag='alttag1',
+    ...               body=['body text 3', 'body text 4'])
+
+Get metadata as XML
+::
+
+    >>> from lxml import etree
+    >>> etree.tostring(md.as_xml(), pretty_print=True)
+    '<metadata>...</metadata>\n'
+
+Metadata is not written to lucene yet
+::
+
+    >>> md.query('uid:12346')
+    []
+
+Call Metadata object to add or update the entry in lucene.
+
+add
+::
+
+    >>> md()
+    >>> len(md.query('uid:12346'))
+    1
+
+update
+::
+
+    >>> md.alttag = 'fubarbaz'
+    >>> md()
+    
+``query`` can be used to load or re-load the Metadata instance it is called on
+::
+
+    >>> md = Metadata(config)
+    >>> md.uid = '12346'
+    >>> md.query()
+    >>> md.alttag
+    'fubarbaz'
+    
+    >>> md.alttag = 'foo'
+    >>> md.query()
+    >>> md.alttag
+    'fubarbaz'
+
+Create Metadata and set attributes manually
+::
+
+    >>> md = Metadata(config)
+    >>> md.uid = '12347',
+    >>> md.author = 'robi2',
+    >>> md.created = datetime.now(),
+    >>> md.effective = datetime.now(),
+    >>> md.expires = datetime.now(),
+    >>> md.revision = '1.1',
+    >>> md.metatype = 'text/plain',
+    >>> md.creator = 'robi2',
+    >>> md.keywords = ['b', 'c'],
+    >>> md.url = 'foo/bar/baz2',
+    >>> md.relations = ['12346'],
+    >>> md.title = 'title2',
+    >>> md.description = 'description2',
+    >>> md.alttag = 'alttag2',
+    >>> md.body = ['body text 4', 'body text 5']
+    >>> md()
+
+Query several Metadata objects
+::
+
+    >>> len(md.query('body '))
+    3
+    
+    >>> solr.delete(q='*:*')

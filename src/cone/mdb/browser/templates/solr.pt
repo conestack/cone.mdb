@@ -1,0 +1,7 @@
+<div>
+  
+  <h1>Solr Settings</h1>
+  
+  <tal:settings replace="structure tile('editform')" />
+
+</div>

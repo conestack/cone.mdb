@@ -12,7 +12,7 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 layer = testing.Security()
 
 TESTFILES = [
-    #'foo.txt',
+    'solr.txt', # XXX: this test resets solr index!!!
 ]
 
 def test_suite():

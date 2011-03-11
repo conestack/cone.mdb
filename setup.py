@@ -29,6 +29,10 @@ setup(name='cone.mdb',
       install_requires=[
           'setuptools',
           'cone.app',
+          'pysolr',
+          'node.ext.mdb',
+          'zamqp',
+          'bda.basen',
       ],
       extras_require = dict(
           test=[

@@ -10,4 +10,5 @@ devsrc/
 eggs/
 parts/
 downloads/
+var/
 src/cone.mdb.egg-info/

@@ -1,0 +1,8 @@
+<tal:ajax xmlns:ajax="http://namesspaces.bluedynamics.eu/ajax" omit-tag="True">
+  <div>
+    <h1 tal:content="model.metadata.title">Revision 0</h1>
+    <tal:contents replace="structure tile('contextmenu')" />
+    <tal:contents replace="structure tile('byline')" />
+    <tal:contents replace="structure tile('revisiondetails')" />
+  </div>
+</tal:ajax>

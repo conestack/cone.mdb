@@ -2,4 +2,12 @@
            xmlns:zcml="http://namespaces.zope.org/zcml"
            xmlns:pyramid="http://pylonshq.com/pyramid">
 
+  <pyramid:scan package=".browser" />
+  
+  <pyramid:view
+    for="*"
+    view=".browser.static_view"
+    name="mdb-static"
+  />
+
 </configure>
