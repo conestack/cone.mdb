@@ -1,10 +1,11 @@
 from plumber import plumber
-from paste.httpexceptions import HTTPFound
+from webob.exc import HTTPFound
 from yafowil.base import factory
 from cone.tile import (
     tile,
     registerTile,
 )
+from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import (
     Form,
@@ -12,6 +13,7 @@ from cone.app.browser.form import (
 )
 from cone.app.browser.utils import make_url
 from cone.mdb.model import Solr
+
 #from cone.mdb.browser.revision import index_metadata_in_solr
 
 
@@ -38,9 +40,13 @@ registerTile('content',
 class SolrReindexForm(Form):
     
     def prepare(self):
-        form = factory(u'form',
-                       name='solrreindexform',
-                       props={'action': self.nodeurl})
+        form = factory(
+            u'form',
+            name='solrreindexform',
+            props={
+                'action': self.nodeurl,
+                'class': 'ajax',
+            })
         form['clear'] = factory(
             'field:label:checkbox',
             props = {
@@ -59,14 +65,16 @@ class SolrReindexForm(Form):
         self.form = form
     
     def reindex(self, widget, data):
-        if data.fetch('reindexform.clear').extracted:
+        if data.fetch('solrreindexform.clear').extracted:
             reindex(self.model.root, clear=True)
         else:
             reindex(self.model.root)
     
     def next(self, request):
-        url = make_url(request.request, node=self.model)
-        return HTTPFound(url)
+        url = make_url(request.request, node=self.model.__parent__)
+        if request.get('ajax'):
+            return AjaxAction(url, 'content', 'inner', '#content')
+        return HTTPFound(location=url)
 
 
 @tile('editform', interface=Solr, permission="manage")
@@ -75,9 +83,14 @@ class SolrSettingsForm(Form):
     __plumbing__ = EditPart
     
     def prepare(self):
-        form = factory(u'form',
-                       name='solrform',
-                       props={'action': self.nodeurl})
+        action = make_url(self.request, node=self.model, resource='edit')
+        form = factory(
+            u'form',
+            name='solrform',
+            props={
+                'action': action,
+                'class': 'ajax',
+            })
         form['server'] = factory(
             'field:label:error:text',
             value = self.model.attrs.server,
@@ -108,20 +121,16 @@ class SolrSettingsForm(Form):
                 'next': self.next,
                 'label': 'Save',
             })
-        form['cancel'] = factory(
-            'submit',
-            props = {
-                'action': 'cancel',
-                'expression': True,
-                'handler': None,
-                'next': self.next,
-                'label': 'Cancel',
-                'skip': True,
-            })
         self.form = form
     
     def save(self, widget, data):
-        self.model.attrs.server = data.fetch('editform.server').extracted
-        self.model.attrs.port = data.fetch('editform.port').extracted
-        self.model.attrs.basepath = data.fetch('editform.basepath').extracted
+        self.model.attrs.server = data.fetch('solrform.server').extracted
+        self.model.attrs.port = data.fetch('solrform.port').extracted
+        self.model.attrs.basepath = data.fetch('solrform.basepath').extracted
         self.model()
+    
+    def next(self, request):
+        url = make_url(request.request, node=self.model.__parent__)
+        if request.get('ajax'):
+            return AjaxAction(url, 'content', 'inner', '#content')
+        return HTTPFound(location=url)

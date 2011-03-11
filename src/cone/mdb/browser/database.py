@@ -1,14 +1,17 @@
 from plumber import plumber
+from webob.exc import HTTPFound
 from yafowil.base import factory
 from cone.tile import (
     tile,
     registerTile,
 )
+from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import (
     Form,
     EditPart,
 )
+from cone.app.browser.utils import make_url
 from cone.mdb.model import Database
 
 
@@ -25,9 +28,14 @@ class DatabaseSettingsForm(Form):
     __plumbing__ = EditPart
     
     def prepare(self):
-        form = factory(u'form',
-                       name='databaseform',
-                       props={'action': self.nodeurl})
+        action = make_url(self.request, node=self.model, resource='edit')
+        form = factory(
+            u'form',
+            name='databaseform',
+            props={
+                'action': action,
+                'class': 'ajax',
+            })
         form['path'] = factory(
             'field:label:error:text',
             value = self.model.attrs.path,
@@ -44,18 +52,14 @@ class DatabaseSettingsForm(Form):
                 'next': self.next,
                 'label': 'Save',
             })
-        form['cancel'] = factory(
-            'submit',
-            props = {
-                'action': 'cancel',
-                'expression': True,
-                'handler': None,
-                'next': self.next,
-                'label': 'Cancel',
-                'skip': True,
-            })
         self.form = form
     
     def save(self, widget, data):
-        self.model.attrs.path = data.fetch('editform.path').extracted
+        self.model.attrs.path = data.fetch('databaseform.path').extracted
         self.model()
+    
+    def next(self, request):
+        url = make_url(request.request, node=self.model.__parent__)
+        if request.get('ajax'):
+            return AjaxAction(url, 'content', 'inner', '#content')
+        return HTTPFound(location=url)

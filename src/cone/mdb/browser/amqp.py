@@ -1,14 +1,17 @@
 from plumber import plumber
+from webob.exc import HTTPFound
 from yafowil.base import factory
 from cone.tile import (
     tile,
     registerTile,
 )
+from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import (
     Form,
     EditPart,
 )
+from cone.app.browser.utils import make_url
 from cone.mdb.model import Amqp
 from cone.mdb import amqp
 
@@ -17,8 +20,7 @@ registerTile('content',
              'cone.mdb:browser/templates/amqp.pt',
              interface=Amqp,
              class_=ProtectedContentTile,
-             permission='login',
-             strict=False)
+             permission='login')
 
 
 @tile('editform', interface=Amqp, permission="manage")
@@ -27,9 +29,14 @@ class AmqpSettingsForm(Form):
     __plumbing__ = EditPart
     
     def prepare(self):
-        form = factory(u'form',
-                       name='amqpform',
-                       props={'action': self.nodeurl})
+        action = make_url(self.request, node=self.model, resource='edit')
+        form = factory(
+            u'form',
+            name='amqpform',
+            props={
+                'action': action,
+                'class': 'ajax',
+            })
         form['host'] = factory(
             'field:label:error:text',
             value = self.model.attrs.host,
@@ -95,21 +102,11 @@ class AmqpSettingsForm(Form):
                 'next': self.next,
                 'label': 'Save',
             })
-        form['cancel'] = factory(
-            'submit',
-            props = {
-                'action': 'cancel',
-                'expression': True,
-                'handler': None,
-                'next': self.next,
-                'label': 'Cancel',
-                'skip': True,
-            })
         self.form = form
     
     def save(self, widget, data):
         def id(name):
-            return 'editform.%s' % name
+            return 'amqpform.%s' % name
         self.model.attrs.host = data.fetch(id('host')).extracted
         self.model.attrs.user = data.fetch(id('user')).extracted
         self.model.attrs.password = data.fetch(id('password')).extracted
@@ -120,3 +117,9 @@ class AmqpSettingsForm(Form):
         self.model.attrs.realm = data.fetch(id('realm')).extracted
         self.model()
         amqp.consumer = amqp.create_consumer()
+    
+    def next(self, request):
+        url = make_url(request.request, node=self.model.__parent__)
+        if request.get('ajax'):
+            return AjaxAction(url, 'content', 'inner', '#content')
+        return HTTPFound(location=url)
