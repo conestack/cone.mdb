@@ -7,10 +7,8 @@ from cone.tile import (
 )
 from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import (
-    Form,
-    EditPart,
-)
+from cone.app.browser.form import Form
+from cone.app.browser.authoring import EditPart
 from cone.app.browser.utils import make_url
 from cone.mdb.model import Database
 
@@ -34,7 +32,6 @@ class DatabaseSettingsForm(Form):
             name='databaseform',
             props={
                 'action': action,
-                'class': 'ajax',
             })
         form['path'] = factory(
             'field:label:error:text',
@@ -60,6 +57,6 @@ class DatabaseSettingsForm(Form):
     
     def next(self, request):
         url = make_url(request.request, node=self.model.__parent__)
-        if request.get('ajax'):
+        if self.ajax_request:
             return AjaxAction(url, 'content', 'inner', '#content')
         return HTTPFound(location=url)

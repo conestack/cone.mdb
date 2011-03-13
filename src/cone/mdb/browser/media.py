@@ -8,8 +8,8 @@ from cone.tile import (
 )
 from cone.app.browser.utils import make_url
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import (
-    Form,
+from cone.app.browser.form import Form
+from cone.app.browser.authoring import (
     AddPart,
     EditPart,
 )

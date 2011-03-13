@@ -7,10 +7,8 @@ from cone.tile import (
 )
 from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import (
-    Form,
-    EditPart,
-)
+from cone.app.browser.form import Form
+from cone.app.browser.authoring import EditPart
 from cone.app.browser.utils import make_url
 from cone.mdb.model import Solr
 
@@ -45,7 +43,6 @@ class SolrReindexForm(Form):
             name='solrreindexform',
             props={
                 'action': self.nodeurl,
-                'class': 'ajax',
             })
         form['clear'] = factory(
             'field:label:checkbox',
@@ -72,8 +69,9 @@ class SolrReindexForm(Form):
     
     def next(self, request):
         url = make_url(request.request, node=self.model.__parent__)
-        if request.get('ajax'):
-            return AjaxAction(url, 'content', 'inner', '#content')
+        ajax_next = self.ajax_next(url)
+        if ajax_next:
+            return ajax_next
         return HTTPFound(location=url)
 
 
@@ -131,6 +129,6 @@ class SolrSettingsForm(Form):
     
     def next(self, request):
         url = make_url(request.request, node=self.model.__parent__)
-        if request.get('ajax'):
+        if self.ajax_request:
             return AjaxAction(url, 'content', 'inner', '#content')
         return HTTPFound(location=url)
