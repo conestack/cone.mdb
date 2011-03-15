@@ -4,6 +4,7 @@
 .pydevproject
 .installed.cfg
 .mr.developer.cfg
+.settings/
 bin/
 develop-eggs/
 devsrc/

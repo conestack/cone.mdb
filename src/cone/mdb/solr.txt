@@ -1,11 +1,9 @@
 Read/write interface for ``mdb`` to ``Lucene`` indexing server
-================================================================
+==============================================================
 
-Test expected server behavior due to ``pysolr``
------------------------------------------------
+Test expected server behavior due to ``pysolr``::
 
-Print helper
-::
+Print helper::
 
     >>> def printres(res):
     ...     for r in res:
@@ -14,23 +12,20 @@ Print helper
     ...         for key in keys:
     ...             print '%s: %s' % (key, r[key])
 
-Create connection
-::
+Create connection::
 
     >>> from pysolr import Solr
     >>> solr = Solr('http://localhost:8983/solr')
     >>> solr
     <pysolr.Solr object at ...>
 
-Delete all entries from solr
-::
+Delete all entries from solr::
 
     >>> solr.delete(q='*:*')
     >>> res = solr.search('solr')
     >>> printres(res)
 
-Add test entry
-::
+Add test entry::
 
     >>> from datetime import datetime
     >>> entry = {
@@ -57,8 +52,7 @@ Add test entry
     ... }
     >>> solr.add([entry])
 
-Query already added entry
-::
+Query already added entry::
 
     >>> res = solr.search('body text 1')
     >>> printres(res)
@@ -82,11 +76,9 @@ Query already added entry
     visibility: hidden
 
 
-Now use API provided by ``cone.mdb.solr`` to manage indexed data
--------------------------------------------------------
+Now use API provided by ``cone.mdb.solr`` to manage indexed data.
 
-Solr configuration
-::
+Solr configuration::
 
     >>> from cone.mdb.solr import Config
     >>> config = Config()
@@ -94,13 +86,18 @@ Solr configuration
     >>> config.port = '8983'
     >>> config.path = 'solr'
 
-The ``Metadata`` object
-::
+The ``Metadata`` object::
 
     >>> from cone.mdb.solr import Metadata
 
-Create Metadata with keywords
-::
+Create Metadata with invalid kw::
+
+    >>> md = Metadata(config, inexistent='inexistent')
+    Traceback (most recent call last):
+      ...
+    AttributeError: 'inexistent' is not a valid attribute
+
+Create Metadata with keywords::
 
     >>> from cone.mdb.solr import Metadata
     >>> md = Metadata(config, 
@@ -120,36 +117,31 @@ Create Metadata with keywords
     ...               alttag='alttag1',
     ...               body=['body text 3', 'body text 4'])
 
-Get metadata as XML
-::
+Get metadata as XML::
 
     >>> from lxml import etree
     >>> etree.tostring(md.as_xml(), pretty_print=True)
     '<metadata>...</metadata>\n'
 
-Metadata is not written to lucene yet
-::
+Metadata is not written to lucene yet::
 
     >>> md.query('uid:12346')
     []
 
 Call Metadata object to add or update the entry in lucene.
 
-add
-::
+add::
 
     >>> md()
     >>> len(md.query('uid:12346'))
     1
 
-update
-::
+update::
 
     >>> md.alttag = 'fubarbaz'
     >>> md()
     
-``query`` can be used to load or re-load the Metadata instance it is called on
-::
+``query`` can be used to load or re-load the Metadata instance it is called on::
 
     >>> md = Metadata(config)
     >>> md.uid = '12346'
@@ -162,8 +154,19 @@ update
     >>> md.alttag
     'fubarbaz'
 
-Create Metadata and set attributes manually
-::
+Query on self fails if uid changed on instance for some reason::
+
+    >>> old_uid = md.uid
+    >>> md.uid = 'inexistent'
+    >>> md.query()
+    Traceback (most recent call last):
+      ...
+    KeyError: u'Entry with uid inexistent does not exist'
+    
+    >>> md.uid = old_uid
+    >>> md.query() 
+
+Create Metadata and set attributes manually::
 
     >>> md = Metadata(config)
     >>> md.uid = '12347',
@@ -183,10 +186,25 @@ Create Metadata and set attributes manually
     >>> md.body = ['body text 4', 'body text 5']
     >>> md()
 
-Query several Metadata objects
-::
+Access inexistent metadata attribute::
+
+    >>> md.inexistent
+    Traceback (most recent call last):
+      ...
+    AttributeError: inexistent
+
+Set inexistent attr via __setattr__::
+
+    >>> md.inexistent = 'inexistent'
+    Traceback (most recent call last):
+      ...
+    AttributeError: 'inexistent' is not a valid attribute
+
+Query several Metadata objects::
 
     >>> len(md.query('body '))
     3
-    
+
+Cleanup::
+
     >>> solr.delete(q='*:*')

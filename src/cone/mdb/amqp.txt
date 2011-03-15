@@ -1,0 +1,18 @@
+amqp consumer starter for cone.mdb
+==================================
+
+Start consumer::
+
+    >>> from cone.mdb.amqp import consumer
+    >>> consumer()
+    True
+
+Start a second time, returns None, already running::
+
+    >>> consumer()
+
+Cleanup::
+
+    >>> from zamqp import runner
+    >>> if runner.event_consumer:
+    ...     runner.cleanup()
