@@ -12,6 +12,7 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 layer = testing.Security()
 
 TESTFILES = [
+    'amqp.txt',
     'solr.txt', # XXX: this test resets solr index!!!
 ]
 
