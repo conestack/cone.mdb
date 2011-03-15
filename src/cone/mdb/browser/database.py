@@ -8,7 +8,7 @@ from cone.tile import (
 from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
-from cone.app.browser.authoring import EditPart
+from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
 from cone.mdb.model import Database
 
@@ -23,7 +23,7 @@ registerTile('content',
 @tile('editform', interface=Database, permission="manage")
 class DatabaseSettingsForm(Form):
     __metaclass__ = plumber
-    __plumbing__ = EditPart
+    __plumbing__ = SettingsPart
     
     def prepare(self):
         action = make_url(self.request, node=self.model, resource='edit')
@@ -54,9 +54,3 @@ class DatabaseSettingsForm(Form):
     def save(self, widget, data):
         self.model.attrs.path = data.fetch('databaseform.path').extracted
         self.model()
-    
-    def next(self, request):
-        url = make_url(request.request, node=self.model.__parent__)
-        if self.ajax_request:
-            return AjaxAction(url, 'content', 'inner', '#content')
-        return HTTPFound(location=url)
