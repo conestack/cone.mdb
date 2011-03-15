@@ -22,7 +22,7 @@ class Amqp(BaseNode):
     
     @property
     def amqpstatus(self):
-        from cone.mdb.amqp import consumer
-        if consumer and consumer.is_alive():
+        from zamqp import runner
+        if runner.event_consumer and runner.event_consumer.isAlive():
             return 'OK'
         return 'Failed'

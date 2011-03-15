@@ -1,0 +1,58 @@
+AMQP settings node
+------------------
+
+    >>> from cone.app import root
+    >>> amqp = root['settings']['amqp']
+    >>> amqp
+    <Amqp object 'amqp' at ...>
+    
+    >>> amqp.attrs.realm
+    '/data'
+    
+    >>> amqp.attrs.exchange
+    'zamqp.events.fanout'
+    
+    >>> amqp.attrs.queue
+    'zamqp_events'
+    
+    >>> amqp.attrs.ssl
+    'False'
+    
+    >>> amqp.attrs.host
+    'localhost'
+    
+    >>> amqp.attrs.user
+    'guest'
+    
+    >>> amqp.attrs.password
+    'guest'
+    
+    >>> amqp.attrs.type
+    'fanout'
+
+XXX: for any reason keys returns no keys here. not mission critical, but should
+     be fixed::
+
+    >>> amqp.attrs.keys()
+    []
+
+Calling AMQP settings node writes config file::
+
+    >>> amqp()
+
+AMQP settings object provides server status information::
+
+    >>> from cone.mdb.amqp import consumer
+    >>> from zamqp.runner import cleanup
+    
+    >>> consumer()
+    True
+    
+    >>> amqp.amqpstatus
+    'OK'
+    
+    >>> cleanup()
+    
+    >>> amqp.amqpstatus
+    'Failed'
+    

@@ -14,6 +14,7 @@ layer = testing.Security()
 TESTFILES = [
     'amqp.txt',
     'solr.txt', # XXX: this test resets solr index!!!
+    'model/amqp.txt',
 ]
 
 def test_suite():
