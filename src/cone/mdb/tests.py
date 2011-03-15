@@ -15,6 +15,7 @@ TESTFILES = [
     'amqp.txt',
     'solr.txt', # XXX: this test resets solr index!!!
     'model/amqp.txt',
+    'model/database.txt',
 ]
 
 def test_suite():

@@ -25,7 +25,7 @@ class Database(BaseNode):
         path = self.attrs.path
         if not path:
             return ''
-        if not os.path.abspath(path):
+        if not os.path.isabs(path):
             path = os.path.sep.join([APP_PATH, path])
         return path
     

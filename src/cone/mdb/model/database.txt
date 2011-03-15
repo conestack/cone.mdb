@@ -1,0 +1,22 @@
+Repositories database settings node
+===================================
+
+    >>> from cone.app import root
+    >>> db = root['settings']['database']
+    >>> db
+    <Database object 'database' at ...>
+    
+    >>> db.attrs.path
+    'var/repositories'
+    
+    >>> db()
+    
+    >>> db.abspath
+    '/.../var/repositories'
+    
+    >>> db.dbstatus
+    'OK'
+    
+    >>> db.attrs.path = ''
+    >>> db.dbstatus
+    'Database path not exists - ""'
