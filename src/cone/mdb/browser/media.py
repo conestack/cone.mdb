@@ -17,8 +17,11 @@ from node.ext.mdb import (
     Media,
     MediaKeys,
 )
-from cone.mdb.model import MediaAdapter
-from cone.mdb.browser.utils import timestamp
+from cone.mdb.model import (
+    MediaAdapter,
+    add_media,
+    update_media,
+)
 
 
 @tile('content',
@@ -88,18 +91,11 @@ class MediaAddForm(MediaForm, Form):
     __plumbing__ = AddPart
     
     def save(self, widget, data):
-        keys = MediaKeys(self.model.__parent__.model.__name__)
-        key = keys.next()
-        keys.dump(key)
-        db = self.model.__parent__.model
-        db[key] = Media()
-        media = MediaAdapter(db[key], None, None)
-        media.metadata.title = data.fetch('mediaform.title').extracted
-        media.metadata.description = \
-            data.fetch('mediaform.description').extracted
-        media.metadata.creator = authenticated_userid(self.request)
-        media.metadata.created = timestamp()
-        media()
+        add_media(
+            self.request,
+            self.model.__parent__,
+            data.fetch('mediaform.title').extracted,
+            data.fetch('mediaform.description').extracted)
 
 
 @tile('editform', interface=MediaAdapter, permission="edit")
@@ -108,9 +104,8 @@ class MediaEditForm(MediaForm, Form):
     __plumbing__ = EditPart
     
     def save(self, widget, data):
-        metadata = self.model.metadata
-        metadata.title = data.fetch('mediaform.title').extracted
-        metadata.description = \
-            data.fetch('mediaform.description').extracted
-        metadata.modified = timestamp()
-        self.model()
+        update_media(
+            self.request,
+            self.model,
+            data.fetch('mediaform.title').extracted,
+            data.fetch('mediaform.description').extracted)

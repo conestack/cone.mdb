@@ -1,5 +1,7 @@
 AMQP settings node
-------------------
+==================
+
+::
 
     >>> from cone.app import root
     >>> amqp = root['settings']['amqp']

@@ -1,6 +1,8 @@
 Repositories
 ============
 
+::
+
     >>> from cone.app import root
 
 Reporitories is a registered plugin on root::

@@ -1,6 +1,8 @@
 Repositories database settings node
 ===================================
 
+::
+
     >>> from cone.app import root
     >>> db = root['settings']['database']
     >>> db

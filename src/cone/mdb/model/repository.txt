@@ -1,5 +1,7 @@
-Repositories
-============
+Repository
+==========
+
+::
 
     >>> from cone.app import root
     >>> repositories = root['repositories']
@@ -78,3 +80,21 @@ Repositories
     'sepp'
     
     >>> layer.logout()
+
+Test layer provides dummy structure, media are available at repo1::
+
+    >>> repository = repositories['repo1']
+    >>> repository.keys()
+    ['a', 'b']
+    
+    >>> a = repository['a']
+    >>> a
+    <MediaAdapter object 'a' at ...>
+    
+    >>> a is repository['a']
+    True
+    
+    >>> repository['inexistent']
+    Traceback (most recent call last):
+      ...
+    KeyError: 'inexistent'

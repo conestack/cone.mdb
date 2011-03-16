@@ -1,6 +1,8 @@
 Solr settings node
 ==================
 
+::
+
     >>> from cone.app import root
     >>> solr = root['settings']['solr']
     >>> solr

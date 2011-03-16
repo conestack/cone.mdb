@@ -1,4 +1,3 @@
-import os
 import re
 from plumber import plumber
 from pyramid.security import authenticated_userid
@@ -23,7 +22,6 @@ from cone.mdb.model import (
     add_repository,
     update_repository,
 )
-from cone.mdb.browser.utils import timestamp
 
 
 registerTile('content',

@@ -7,7 +7,11 @@ from cone.mdb.model.repository import (
     add_repository,
     update_repository,
 )
-from cone.mdb.model.media import MediaAdapter
+from cone.mdb.model.media import (
+    MediaAdapter,
+    add_media,
+    update_media,
+)
 from cone.mdb import amqp
 
 # XXX: later

@@ -1,0 +1,90 @@
+Media
+=====
+
+::
+
+    >>> from cone.app import root
+    >>> repository = root['repositories']['repo1']
+    
+    >>> from cone.mdb.model import add_media
+    >>> from pyramid.testing import DummyRequest
+    
+    >>> request = DummyRequest()
+    
+    >>> layer.authenticate('andi')
+    
+    >>> add_media(request,
+    ...           repository,
+    ...           'Media 3',
+    ...           'Media 3 description')
+    
+    >>> repository.keys()
+    ['a', 'b', 'c']
+    
+    >>> media = repository['c']
+    >>> media
+    <MediaAdapter object 'c' at ...>
+    
+    >>> properties = media.properties
+    >>> properties.keys()
+    ['action_view', 'editable', 'in_navtree', 'action_list', 'action_up']
+    
+    >>> properties.action_view
+    True
+    
+    >>> properties.editable
+    True
+    
+    >>> properties.in_navtree
+    True
+    
+    >>> properties.action_list
+    True
+    
+    >>> properties.action_up
+    True
+    
+    >>> metadata = media.metadata
+    >>> metadata
+    <cone.app.model.XMLProperties object at ...>
+    
+    >>> metadata.keys()
+    ['title', 'description', 'creator', 'created']
+    
+    >>> metadata.title
+    u'Media 3'
+    
+    >>> metadata.description
+    u'Media 3 description'
+    
+    >>> metadata.creator
+    u'andi'
+    
+    >>> metadata.created
+    datetime.datetime(...)
+    
+    >>> from cone.mdb.model import update_media
+    
+    >>> layer.authenticate('anna')
+    
+    >>> update_media(request, media, u'New title', u'New description')
+    
+    >>> metadata.keys()
+    ['title', 'description', 'creator', 'created', 'modified', 'modified_by']
+    
+    >>> metadata.title
+    u'New title'
+    
+    >>> metadata.description
+    u'New description'
+    
+    >>> metadata.modified
+    datetime.datetime(...)
+    
+    >>> metadata.modified > metadata.created
+    True
+    
+    >>> metadata.modified_by
+    'anna'
+    
+    >>> layer.logout()

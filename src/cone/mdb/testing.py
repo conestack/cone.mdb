@@ -5,15 +5,40 @@ from plone.testing import Layer
 from pyramid.testing import DummyRequest
 from cone.app import root
 from cone.app.testing import Security
-from cone.mdb.model import add_repository
+from cone.mdb.model import (
+    add_repository,
+    add_media,
+)
 
 security = Security()
+
 
 class Database(Layer):
     """Test layer providing dummy repositories
     """
     
     defaultBases = (security,)
+    
+    def _add_dummy_repositories(self):
+        request = DummyRequest()
+        repositories = root['repositories']
+        for i in range(1, 3):
+            add_repository(
+                request,
+                repositories,
+                'repo%i' % i,
+                'Repository %i' % i,
+                'Repository %i description' % i)
+    
+    def _add_dummy_media(self):
+        request = DummyRequest()
+        repository = root['repositories']['repo1']
+        for i in range(1, 3):
+            add_media(
+                request,
+                repository,
+                'Media %i' % i,
+                'Media %i description' % i)
     
     def setUp(self, args=None):
         print "Rebase MDB database root to temp directory"
@@ -22,15 +47,9 @@ class Database(Layer):
         self.orgin_db_path = self.db.attrs.path
         self.db.attrs.path = self.tempdir
         self.db()
-        request = DummyRequest()
         self.authenticate('manager')
-        repositories = root['repositories']
-        for i in range(1, 3):
-            add_repository(request,
-                           repositories,
-                           'repo%i' % i,
-                           'Repository %i' % i,
-                           'Repository %i description' % i)
+        self._add_dummy_repositories()
+        self._add_dummy_media()
         self.logout()
     
     def tearDown(self):
