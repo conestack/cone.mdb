@@ -1,0 +1,26 @@
+Solr settings node
+==================
+
+    >>> from cone.app import root
+    >>> solr = root['settings']['solr']
+    >>> solr
+    <Solr object 'solr' at ...>
+    
+    >>> solr.attrs.basepath
+    'solr'
+    
+    >>> solr.attrs.port
+    '8983'
+    
+    >>> solr.attrs.server
+    'localhost'
+    
+    >>> solr()
+    
+    >>> solr.attrs.server = 'inexistent'
+    >>> solr.solrstatus
+    'Failed'
+    
+    >>> solr.attrs.server = 'localhost'
+    >>> solr.solrstatus
+    'OK'
