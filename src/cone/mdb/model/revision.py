@@ -64,7 +64,7 @@ def set_metadata(metadata, data):
     
     ``metadata``
         node.ext.mdb.Metadata
-    ``kw``
+    ``data``
         dict containing metadata
     """
     for key, val in data.items():
@@ -72,6 +72,28 @@ def set_metadata(metadata, data):
             continue
         setattr(metadata, key, val)
 
+
+def set_binary(revision, data):
+    """Set binary on revision.
+    
+    ``revision``
+        node.ext.mdb.Revision
+    ``data``
+        dict containing revision data
+    """
+    metadata = revision['metadata']
+    file = data['data']
+    if not file:
+        payload = ''
+    else:
+        if isinstance(file, basestring):
+            payload = file
+        else:
+            payload = file['file'].read()
+            metadata.metatype = file['mimetype']
+            metadata.filename = file['filename']
+    revision['binary'] = MDBBinary(payload=payload)
+    
 
 def solr_date(dt):
     """Return date string acceppted by solr.
@@ -143,17 +165,6 @@ def add_revision(request, media, data):
     mdb_media[key] = revision
     metadata = MDBMetadata()
     revision['metadata'] = metadata
-    file = data['data']
-    if not file:
-        payload = ''
-    else:
-        if isinstance(file, basestring):
-            payload = file
-        else:
-            payload = file['file'].read()
-            metadata.metatype = file['mimetype']
-            metadata.filename = file['filename']
-    revision['binary'] = MDBBinary(payload=payload)
     metadata.revision = key
     metadata.uid = str(uuid.uuid4())
     metadata.created = timestamp()
@@ -166,6 +177,7 @@ def add_revision(request, media, data):
     metadata.visibility = data['visibility']
     metadata.body = data['body']
     
+    set_binary(revision, data)
     set_metadata(metadata, data)
     media()
     index_metadata(solr_config(media), revision)
@@ -182,17 +194,6 @@ def update_revision(request, revision, data):
         revision data
     """
     metadata = revision.metadata
-    file = data['data']
-    if not file:
-        payload = ''
-    else:
-        if isinstance(file, basestring):
-            payload = file
-        else:
-            payload = file['file'].read()
-            metadata.metatype = file['mimetype']
-            metadata.filename = file['filename']
-    revision.model['binary'].payload = payload
     if not metadata.creator:
         metadata.creator = authenticated_userid(request)
     flag = data['flag']
@@ -213,6 +214,7 @@ def update_revision(request, revision, data):
     metadata.visibility = visibility
     metadata.body = data['body']
     
+    set_binary(revision.model, data)
     set_metadata(metadata, data)
     revision()
     index_metadata(solr_config(revision), revision.model)
@@ -235,7 +237,9 @@ class RevisionAdapter(AdapterNode):
     @property
     def metadata(self):
         if self.model:
-            return self.model['metadata']
+            metadata = self.model.get('metadata')
+            if metadata:
+                return metadata
         return Properties()                                 #pragma NO COVERAGE
     
     def __iter__(self):
@@ -253,3 +257,39 @@ info.description = 'A revision.'
 info.node = RevisionAdapter
 info.addables = []
 registerNodeInfo('revision', info)
+
+
+###
+# workflow related
+
+def state_working_copy(content, info):
+    print content
+    print info
+
+def state_active(content, info):
+    print content
+    print info
+
+def state_frozen(content, info):
+    print content
+    print info
+
+def working_copy_2_active(content, info):
+    print content
+    print info
+
+def active_2_working_copy(content, info):
+    print content
+    print info
+
+def active_2_frozen(content, info):
+    print content
+    print info
+
+def working_copy_2_frozen(content, info):
+    print content
+    print info
+
+def frozen_2_working_copy(content, info):
+    print content
+    print info

@@ -1,0 +1,71 @@
+<configure xmlns="http://namespaces.repoze.org/bfg">
+
+  <include package="repoze.workflow" file="meta.zcml"/>
+
+  <workflow type="revision"
+            name="Revision workflow"
+            state_attr="state"
+            initial_state="working_copy"
+            content_types=".revision.RevisionAdapter"
+            permission_checker="pyramid.security.has_permission">
+
+    <state name="working_copy"
+           callback=".revision.state_working_copy">
+      <key name="title" value="Working copy" />
+      <key name="description" value="Open for changes" />
+    </state>
+
+    <state name="active"
+           callback=".revision.state_active">
+      <key name="title" value="Active"/>
+      <key name="description" value="Current default revision" />
+    </state>
+   
+    <state name="frozen"
+           callback=".revision.state_frozen">
+      <key name="title" value="Frozen"/>
+      <key name="description" value="No more changes" />
+    </state>
+
+    <transition
+       name="working_copy_2_active"
+       callback=".revision.working_copy_2_active"
+       from_state="working_copy"
+       to_state="active"
+       permission="edit"
+    />
+	
+	<transition
+       name="active_2_working_copy"
+       callback=".revision.active_2_working_copy"
+       from_state="active"
+       to_state="working_copy"
+       permission="edit"
+    />
+	
+	<transition
+       name="active_2_frozen"
+       callback=".revision.active_2_frozen"
+       from_state="active"
+       to_state="frozen"
+       permission="edit"
+    />
+	
+	<transition
+       name="working_copy_2_frozen"
+       callback=".revision.working_copy_2_frozen"
+       from_state="working_copy"
+       to_state="frozen"
+       permission="edit"
+    />
+	
+	<transition
+       name="frozen_2_working_copy"
+       callback=".revision.frozen_2_working_copy"
+       from_state="frozen"
+       to_state="working_copy"
+       permission="manage"
+    />
+  </workflow>
+
+</configure>

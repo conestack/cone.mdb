@@ -1,6 +1,7 @@
 import tempfile
 import shutil
 import datetime
+import pyramid_zcml
 from plone.testing import Layer
 from pyramid.testing import DummyRequest
 from cone.app import root
@@ -69,6 +70,7 @@ class Database(Layer):
     
     def setUp(self, args=None):
         print "Rebase MDB database root to temp directory"
+        pyramid_zcml.zcml_configure('configure.zcml', 'cone.mdb')
         self.tempdir = tempfile.mkdtemp()
         self.db = root['settings']['database']
         self.orgin_db_path = self.db.attrs.path

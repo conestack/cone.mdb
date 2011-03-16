@@ -1,4 +1,3 @@
-import uuid
 from webob import Response
 from plumber import plumber
 from zope.component import queryUtility
@@ -7,6 +6,7 @@ from pyramid.view import view_config
 from yafowil.base import (
     factory,
     ExtractionError,
+    UNSET,
 )
 from cone.tile import (
     tile,
@@ -35,8 +35,9 @@ from cone.mdb.model import (
     RevisionAdapter,
     add_revision,
     update_revision,
+    solr_config,
 )
-from cone.mdb.model import solr_config
+from cone.mdb.model.revision import solr_whitelist
 from cone.mdb.solr import Metadata as SolrMetadata
 
 
@@ -56,7 +57,7 @@ class RevisionDetails(Tile):
         for rel in relations:
             query = '%suid:%s OR ' % (query, rel)
         query = query.strip(' OR ')
-        md = SolrMetadata(solr_config(self.model))
+        md = SolrMetadata(solr_config(self.model), solr_whitelist)
         for relmd in md.query(q=query):
             ret.append({
                 'target': '%s/%s' % (self.request.application_url, relmd.path),
@@ -84,7 +85,7 @@ class RevisionForm(object):
         action = make_url(self.request, node=self.model, resource=resource)
         form = factory(
             u'form',
-            name = self.formname,
+            name = self.form_name,
             props = {
                 'action': action,
             })
@@ -199,7 +200,7 @@ class RevisionForm(object):
     def visibility_vocab(self):
         """XXX: available transitions
         """
-        if self.adding or self.model.metadata.flag == 'draft':
+        if self.action_resource == 'add' or self.model.metadata.flag == 'draft':
             return [('hidden', 'hidden')]
         return [
             ('hidden', 'Hidden'),
@@ -210,7 +211,7 @@ class RevisionForm(object):
     def flag_vocab(self):
         """XXX: available transitions
         """
-        if self.adding:
+        if self.action_resource == 'add':
             return [('draft', 'Draft')]
         if self.model.metadata.flag == 'draft':
             return [
@@ -232,7 +233,7 @@ class RevisionForm(object):
         relations = self.model.metadata.relations
         if not relations:
             return vocab
-        md = SolrMetadata(solr_config(self.model))
+        md = SolrMetadata(solr_config(self.model), solr_whitelist)
         for relation in relations:
             rel = md.query(q='uid:%s' % relation)
             if rel and rel[0].get('title'):
@@ -262,12 +263,14 @@ class RevisionForm(object):
         return payload
     
     def keywords_extractor(self, widget, data):
+        if data.extracted is UNSET:
+            return []
         keywords = data.extracted.split('\n')
         return [kw.strip('\r') for kw in keywords if kw]
     
     def relations_extractor(self, widget, data):
         relations = data.extracted
-        if not relations:
+        if relations is UNSET:
             relations = list()
         if isinstance(relations, basestring):
             relations = [relations]
@@ -275,7 +278,7 @@ class RevisionForm(object):
 
     def revision_data(self, data):
         def id(s):
-            return '%s.%s' % (self.formname, s)
+            return '%s.%s' % (self.form_name, s)
         data = {
             'title': data.fetch(id('title')).extracted,
             'author': data.fetch(id('author')).extracted,
@@ -296,6 +299,7 @@ class RevisionForm(object):
             data['alttag'],
             ', '.join(data['keywords']),
         ])
+        print data
         return data
 
 
