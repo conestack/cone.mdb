@@ -1,0 +1,80 @@
+Repositories
+============
+
+    >>> from cone.app import root
+    >>> repositories = root['repositories']
+    
+    >>> from cone.mdb.model import add_repository
+    >>> from pyramid.testing import DummyRequest
+    
+    >>> request = DummyRequest()
+    
+    >>> layer.authenticate('max')
+    
+    >>> add_repository(request,
+    ...                repositories,
+    ...                'repo3',
+    ...                'Repository 3',
+    ...                'Repository 3 description')
+    
+    >>> repository = repositories['repo3']
+    >>> repository
+    <RepositoryAdapter object 'repo3' at ...>
+    
+    >>> properties = repository.properties
+    >>> properties.keys()
+    ['editable', 'in_navtree', 'action_up']
+    
+    >>> properties.editable
+    True
+    
+    >>> properties.in_navtree
+    True
+    
+    >>> properties.action_up
+    True
+    
+    >>> metadata = repository.metadata
+    >>> metadata
+    <cone.app.model.XMLProperties object at ...>
+    
+    >>> metadata.keys()
+    ['title', 'description', 'creator', 'created']
+    
+    >>> metadata.title
+    u'Repository 3'
+    
+    >>> metadata.description
+    u'Repository 3 description'
+    
+    >>> metadata.creator
+    u'max'
+    
+    >>> metadata.created
+    datetime.datetime(...)
+    
+    >>> from cone.mdb.model import update_repository
+    
+    >>> layer.authenticate('sepp')
+    
+    >>> update_repository(request, repository, u'New title', u'New description')
+    
+    >>> metadata.keys()
+    ['title', 'description', 'creator', 'created', 'modified', 'modified_by']
+    
+    >>> metadata.title
+    u'New title'
+    
+    >>> metadata.description
+    u'New description'
+    
+    >>> metadata.modified
+    datetime.datetime(...)
+    
+    >>> metadata.modified > metadata.created
+    True
+    
+    >>> metadata.modified_by
+    'sepp'
+    
+    >>> layer.logout()

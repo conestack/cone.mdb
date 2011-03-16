@@ -2,7 +2,11 @@ from cone.mdb.model.solr import Solr
 from cone.mdb.model.amqp import Amqp
 from cone.mdb.model.database import Database
 from cone.mdb.model.repositories import Repositories
-from cone.mdb.model.repository import RepositoryAdapter
+from cone.mdb.model.repository import (
+    RepositoryAdapter,
+    add_repository,
+    update_repository,
+)
 from cone.mdb.model.media import MediaAdapter
 from cone.mdb import amqp
 

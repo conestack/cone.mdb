@@ -18,7 +18,11 @@ from cone.app.browser.authoring import (
     EditPart,
 )
 from node.ext.mdb import Repository
-from cone.mdb.model import RepositoryAdapter
+from cone.mdb.model import (
+    RepositoryAdapter,
+    add_repository,
+    update_repository,
+)
 from cone.mdb.browser.utils import timestamp
 
 
@@ -100,16 +104,12 @@ class RepositoryAddForm(RepositoryForm, Form):
     __plumbing__ = AddPart
     
     def save(self, widget, data):
-        db = Repository(os.path.join(self.model.__parent__.dbpath,
-                        data.fetch('repositoryform.id').extracted))
-        repository = RepositoryAdapter(db, None, None)
-        metadata = repository.metadata
-        metadata.title = data.fetch('repositoryform.title').extracted
-        metadata.description = \
-            data.fetch('repositoryform.description').extracted
-        metadata.creator = authenticated_userid(self.request)
-        metadata.created = timestamp()
-        repository()
+        add_repository(
+            self.request,
+            self.model.__parent__,
+            data.fetch('repositoryform.id').extracted,
+            data.fetch('repositoryform.title').extracted,
+            data.fetch('repositoryform.description').extracted)
 
 
 @tile('editform', interface=RepositoryAdapter, permission="edit")
@@ -118,9 +118,8 @@ class RepositoryEditForm(RepositoryForm, Form):
     __plumbing__ = EditPart
     
     def save(self, widget, data):
-        metadata = self.model.metadata
-        metadata.title = data.fetch('repositoryform.title').extracted
-        metadata.description = \
-            data.fetch('repositoryform.description').extracted
-        metadata.modified = timestamp()
-        self.model()
+        update_repository(
+            self.request,
+            self.model,
+            data.fetch('repositoryform.title').extracted,
+            data.fetch('repositoryform.description').extracted)

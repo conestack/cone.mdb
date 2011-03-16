@@ -30,29 +30,15 @@ Provided metadata::
     >>> repositories.metadata.title
     'Repositories'
 
-Create dummy repositories container::
-
-    >>> import os
-    >>> import tempfile
-    >>> tempdir = tempfile.mkdtemp()
-    
-    >>> db = root['settings']['database']
-    >>> old_db_path = db.attrs.path
-    >>> db.attrs.path = tempdir
-    >>> db()
-    
-    >>> os.mkdir(os.path.join(tempdir, 'a'))
-    >>> os.mkdir(os.path.join(tempdir, 'b'))
-
 ``keys``::
 
     >>> repositories.keys()
-    ['a', 'b']
+    ['repo1', 'repo2']
 
 ``__iter__``::
 
     >>> [key for key in repositories]
-    ['a', 'b']
+    ['repo1', 'repo2']
 
 ``__getitem__``::
 
@@ -61,20 +47,12 @@ Create dummy repositories container::
       ...
     KeyError: 'inexistent'
     
-    >>> repositories['a']
-    <RepositoryAdapter object 'a' at ...>
+    >>> repositories['repo1']
+    <RepositoryAdapter object 'repo1' at ...>
     
-    >>> b = repositories['b']
-    >>> b
-    <RepositoryAdapter object 'b' at ...>
+    >>> repo = repositories['repo2']
+    >>> repo
+    <RepositoryAdapter object 'repo2' at ...>
     
-    >>> repositories['b'] is b
+    >>> repositories['repo2'] is repo
     True
-
-Cleanup dummy repositories container::
-
-    >>> db.attrs.path = old_db_path
-    >>> db()
-    
-    >>> import shutil
-    >>> shutil.rmtree(tempdir)

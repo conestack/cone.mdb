@@ -18,6 +18,7 @@ TESTFILES = [
     'model/database.txt',
     
     'model/repositories.txt',
+    'model/repository.txt',
     
     'model/solr.txt',
     'model/utils.txt',
