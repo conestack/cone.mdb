@@ -35,14 +35,15 @@ registerTile('content',
 class RepositoryForm(object):
     
     def prepare(self):
-        resource='add'
-        if self.model.__name__ is not None:
-            resource = 'edit'
+        resource = self.action_resource
         action = make_url(self.request, node=self.model, resource=resource)
-        form = factory(u'form',
-                       name='repositoryform',
-                       props={'action': action})
-        if self.model.__name__ is None:
+        form = factory(
+            u'form',
+            name = 'repositoryform',
+            props = {
+                'action': action,
+            })
+        if resource == 'add':
             form['id'] = factory(
                 'field:label:*valid_id:error:text',
                 props = {

@@ -89,10 +89,17 @@ Solr configuration::
 The ``Metadata`` object::
 
     >>> from cone.mdb.solr import Metadata
+    
+Valid attributes::
+
+    >>> attributes = ['uid', 'author', 'created', 'effective',
+    ...     'expires', 'revision', 'metatype', 'creator', 'keywords', 'url',
+    ...     'relations', 'title', 'description', 'alttag', 'body', 'flag',
+    ...     'visibility', 'path', 'modified', 'filename']
 
 Create Metadata with invalid kw::
 
-    >>> md = Metadata(config, inexistent='inexistent')
+    >>> md = Metadata(config, attributes, inexistent='inexistent')
     Traceback (most recent call last):
       ...
     AttributeError: 'inexistent' is not a valid attribute
@@ -101,6 +108,7 @@ Create Metadata with keywords::
 
     >>> from cone.mdb.solr import Metadata
     >>> md = Metadata(config, 
+    ...               attributes,
     ...               uid='12346',
     ...               author='robi1',
     ...               created=datetime.now(),
@@ -143,7 +151,7 @@ update::
     
 ``query`` can be used to load or re-load the Metadata instance it is called on::
 
-    >>> md = Metadata(config)
+    >>> md = Metadata(config, attributes)
     >>> md.uid = '12346'
     >>> md.query()
     >>> md.alttag
@@ -168,7 +176,7 @@ Query on self fails if uid changed on instance for some reason::
 
 Create Metadata and set attributes manually::
 
-    >>> md = Metadata(config)
+    >>> md = Metadata(config, attributes)
     >>> md.uid = '12347',
     >>> md.author = 'robi2',
     >>> md.created = datetime.now(),

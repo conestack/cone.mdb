@@ -1,6 +1,6 @@
 from cone.app.browser import ajax
 from cone.mdb.solr import Metadata
-from cone.mdb.browser.utils import solr_config
+from cone.mdb.model.utils import solr_config
 
 def solr_livesearch_callback(model, request):
     config = solr_config(model)

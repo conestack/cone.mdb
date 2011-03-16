@@ -20,6 +20,7 @@ TESTFILES = [
     'model/repositories.txt',
     'model/repository.txt',
     'model/media.txt',
+    'model/revision.txt',
     
     'model/solr.txt',
     'model/utils.txt',

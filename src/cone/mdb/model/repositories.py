@@ -7,8 +7,8 @@ from cone.app.model import (
     registerNodeInfo,
 )
 from node.ext.mdb import Repository
-from cone.mdb.model.repository import RepositoryAdapter
 from cone.mdb.model.utils import DBLocation
+from cone.mdb.model.repository import RepositoryAdapter
 
 
 class Repositories(BaseNode, DBLocation):

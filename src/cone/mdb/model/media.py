@@ -12,7 +12,7 @@ from cone.app.model import (
     registerNodeInfo,
 )
 from cone.mdb.model.revision import RevisionAdapter
-from cone.mdb.browser.utils import timestamp
+from cone.mdb.model.utils import timestamp
 
 
 def add_media(request, repository, title, description):

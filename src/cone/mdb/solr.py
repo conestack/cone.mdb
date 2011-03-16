@@ -11,31 +11,9 @@ class Config(object):
 
 class Metadata(dict):
     
-    attributes = [
-        'uid',
-        'author',
-        'created',
-        'effective',
-        'expires',
-        'revision',
-        'metatype',
-        'creator',
-        'keywords',
-        'url',
-        'relations',
-        'title',
-        'description',
-        'alttag',
-        'body',
-        'flag',
-        'visibility',
-        'path',
-        'modified',
-        'filename',
-    ]
-    
-    def __init__(self, config, **kwargs):
+    def __init__(self, config, attributes, **kwargs):
         object.__setattr__(self, 'config', config)
+        object.__setattr__(self, 'attributes', attributes)
         for arg in kwargs.keys():
             if arg in object.__getattribute__(self, 'attributes'):
                 self[arg] = kwargs[arg]
@@ -66,10 +44,11 @@ class Metadata(dict):
                 self[key] = value
         else:
             config = object.__getattribute__(self, 'config')
+            attributes = object.__getattribute__(self, 'attributes')
             res = self.solr().search(q, **kw)
             ret = list()
             for r in res:
-                ret.append(Metadata(config, **r))
+                ret.append(Metadata(config, attributes, **r))
             return ret
     
     def as_xml(self):
@@ -87,7 +66,7 @@ class Metadata(dict):
     def solr(self):
         try:
             return object.__getattribute__(self, '_solr')
-        except AttributeError, e:
+        except AttributeError:
             cfg = object.__getattribute__(self, 'config')
             solr = Solr('http://%s:%s/%s' % (cfg.server, cfg.port, cfg.path))
             object.__setattr__(self, '_solr', solr)

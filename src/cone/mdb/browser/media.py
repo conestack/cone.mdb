@@ -42,13 +42,14 @@ class MediaTile(ProtectedContentTile):
 class MediaForm(object):
     
     def prepare(self):
-        resource='add'
-        if self.model.__name__ is not None:
-            resource = 'edit'
+        resource = self.action_resource
         action = make_url(self.request, node=self.model, resource=resource)
-        form = factory(u'form',
-                       name='mediaform',
-                       props={'action': action})
+        form = factory(
+            u'form',
+            name = 'mediaform',
+            props = {
+                'action': action,
+            })
         form['title'] = factory(
             'field:label:error:text',
             value = self.model.metadata.title,

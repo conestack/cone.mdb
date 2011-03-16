@@ -1,0 +1,9 @@
+Revision
+========
+
+::
+
+    >>> from cone.app import root
+    >>> revision = root['repositories']['repo1']['a']['0']
+    >>> revision
+    <RevisionAdapter object '0' at ...>

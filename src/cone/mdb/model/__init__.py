@@ -12,6 +12,16 @@ from cone.mdb.model.media import (
     add_media,
     update_media,
 )
+from cone.mdb.model.revision import (
+    RevisionAdapter,
+    add_revision,
+    update_revision,
+)
+from cone.mdb.model.utils import (
+    timestamp,
+    solr_config,
+    DBLocation,
+)
 from cone.mdb import amqp
 
 # XXX: later

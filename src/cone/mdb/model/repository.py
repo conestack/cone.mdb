@@ -9,8 +9,10 @@ from cone.app.model import (
 )
 from node.ext.mdb import Repository
 from cone.mdb.model.media import MediaAdapter
-from cone.mdb.model.utils import DBLocation
-from cone.mdb.browser.utils import timestamp
+from cone.mdb.model.utils import (
+    DBLocation,
+    timestamp,
+)
 
 
 def add_repository(request, repositories, id, title, description):

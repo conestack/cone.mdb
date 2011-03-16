@@ -1,5 +1,4 @@
 import uuid
-import datetime
 from webob import Response
 from plumber import plumber
 from zope.component import queryUtility
@@ -32,11 +31,12 @@ from node.ext.mdb import (
     Metadata,
     Binary,
 )
-from cone.mdb.model.revision import RevisionAdapter
-from cone.mdb.browser.utils import (
-    timestamp,
-    solr_config,
+from cone.mdb.model import (
+    RevisionAdapter,
+    add_revision,
+    update_revision,
 )
+from cone.mdb.model import solr_config
 from cone.mdb.solr import Metadata as SolrMetadata
 
 
@@ -46,6 +46,8 @@ class RevisionDetails(Tile):
     
     @property
     def relations(self):
+        """XXX: move relations lookup
+        """
         relations = self.model.metadata.relations
         ret = list()
         if not relations:
@@ -74,13 +76,18 @@ def download(model, request):
 
 class RevisionForm(object):
     
+    form_name = 'revisionform'
+    
     def prepare(self):
         metadata = self.model.metadata
-        resource = self.adding and 'add' or 'edit'
+        resource = self.action_resource
         action = make_url(self.request, node=self.model, resource=resource)
-        form = factory(u'form',
-                       name='revisionform',
-                       props={'action': action})
+        form = factory(
+            u'form',
+            name = self.formname,
+            props = {
+                'action': action,
+            })
         form['visibility'] = factory(
             'field:label:error:select',
             value = metadata.visibility,
@@ -116,20 +123,25 @@ class RevisionForm(object):
                 'rows': 5,
             })
         form['keywords'] = factory(
-            'field:label:textarea',
-            value = self.keywords,
+            'field:label:textarea:*keywords',
+            value = self.keywords_value,
             props = {
                 'label': 'Keywords',
                 'rows': 5,
+            },
+            custom = {
+                'keywords': ([self.keywords_extractor], [], [], []),
             })
-        relations = self.relations
         form['relations'] = factory(
-            'field:label:reference',
-            value = [rel[0] for rel in relations],
+            'field:label:reference:*relations',
+            value = self.relations_value,
             props = {
                 'label': 'Relations',
                 'multivalued': True,
-                'vocabulary': relations,
+                'vocabulary': self.relations_vocab,
+            },
+            custom = {
+                'relations': ([self.relations_extractor], [], [], []),
             })
         form['effective'] = factory(
             'field:label:error:datetime',
@@ -155,12 +167,9 @@ class RevisionForm(object):
             props = {
                 'label': 'Alt Tag for publishing',
             })
-        payload = None
-        if self.model.__name__ is not None:
-            payload = self.model.model['binary'].payload
         form['data'] = factory(
             'field:label:error:file',
-            value = payload,
+            value = self.data_value,
             props = {
                 'label': 'Data',
                 'required': 'No file uploaded',
@@ -187,11 +196,9 @@ class RevisionForm(object):
         self.form = form
     
     @property
-    def adding(self):
-        return self.model.__name__ is None
-    
-    @property
     def visibility_vocab(self):
+        """XXX: available transitions
+        """
         if self.adding or self.model.metadata.flag == 'draft':
             return [('hidden', 'hidden')]
         return [
@@ -201,6 +208,8 @@ class RevisionForm(object):
         
     @property
     def flag_vocab(self):
+        """XXX: available transitions
+        """
         if self.adding:
             return [('draft', 'Draft')]
         if self.model.metadata.flag == 'draft':
@@ -216,14 +225,9 @@ class RevisionForm(object):
             return [('frozen', 'Frozen')]
     
     @property
-    def keywords(self):
-        keywords = self.model.metadata.keywords
-        if not keywords:
-            keywords = list()
-        return u'\n'.join(keywords)
-    
-    @property
-    def relations(self):
+    def relations_vocab(self):
+        """XXX: move relations lookup
+        """
         vocab = list()
         relations = self.model.metadata.relations
         if not relations:
@@ -237,70 +241,63 @@ class RevisionForm(object):
                 title = relation
             vocab.append((relation, title))
         return vocab
-
-    def set_metadata_from_form(self, metadata, data):
-        def id(s):
-            return 'revisionform.%s' % s
-        metadata.title = data.fetch(id('title')).extracted
-        metadata.author = data.fetch(id('author')).extracted
-        metadata.description = data.fetch(id('description')).extracted
-        keywords = data.fetch(id('keywords')).extracted.split('\n')
-        keywords = [kw.strip('\r') for kw in keywords if kw]
-        metadata.keywords = keywords
-        relations = data.fetch(id('relations')).extracted
+    
+    @property
+    def relations_value(self):
+        relations = self.relations_vocab
+        return [rel[0] for rel in relations]
+    
+    @property
+    def keywords_value(self):
+        keywords = self.model.metadata.keywords
+        if not keywords:
+            keywords = list()
+        return u'\n'.join(keywords)
+    
+    @property
+    def data_value(self):
+        payload = None
+        if self.model.__name__ is not None:
+            payload = self.model.model['binary'].payload
+        return payload
+    
+    def keywords_extractor(self, widget, data):
+        keywords = data.extracted.split('\n')
+        return [kw.strip('\r') for kw in keywords if kw]
+    
+    def relations_extractor(self, widget, data):
+        relations = data.extracted
         if not relations:
             relations = list()
         if isinstance(relations, basestring):
             relations = [relations]
-        metadata.relations = relations
-        metadata.effective = data.fetch(id('effective')).extracted
-        metadata.expires = data.fetch(id('expires')).extracted
-        metadata.alttag = data.fetch(id('alttag')).extracted
-        body = ' '.join([
-            metadata.title,
-            metadata.description, 
-            metadata.author,
-            metadata.alttag,
-            data.fetch(id('keywords')).extracted,
-            ])
-        metadata.body = body
-    
-    def index_metadata_in_solr(self, model):
-        try:
-            metadata = model.metadata
-            path = '/'.join(nodepath(model))
-            kw = {
-                'uid': metadata.uid,
-                'author': metadata.author,
-                'revision': model.__name__,
-                'metatype': metadata.metatype,
-                'creator': metadata.creator,
-                'keywords': metadata.keywords,
-                'url': '', # XXX
-                'relations': metadata.relations,
-                'title': metadata.title,
-                'description': metadata.description,
-                'alttag': metadata.alttag,
-                'body': metadata.body,
-                'flag': metadata.flag,
-                'visibility': metadata.visibility,
-                'path': path,
-                'filename': metadata.filename,
-            }
-            self.solr_date(metadata.created, kw, 'created')
-            self.solr_date(metadata.effective, kw, 'effective')
-            self.solr_date(metadata.expires, kw, 'expires')
-            self.solr_date(metadata.modified, kw, 'modified')
-            md = SolrMetadata(solr_config(model), **kw)
-            md()
-        except Exception, e:
-            print e
-            raise # debug
-    
-    def solr_date(self, dt, kw, key):
-        if isinstance(dt, datetime.datetime):
-            date = '%sZ' % dt.isoformat()
-            kw[key] = date
+        return relations
+
+    def revision_data(self, data):
+        def id(s):
+            return '%s.%s' % (self.formname, s)
+        data = {
+            'title': data.fetch(id('title')).extracted,
+            'author': data.fetch(id('author')).extracted,
+            'description': data.fetch(id('description')).extracted,
+            'keywords': data.fetch(id('keywords')).extracted,
+            'relations': data.fetch(id('relations')).extracted,
+            'effective': data.fetch(id('effective')).extracted,
+            'expires': data.fetch(id('expires')).extracted,
+            'alttag': data.fetch(id('alttag')).extracted,
+            'data': data.fetch(id('data')).extracted,
+            'visibility': data.fetch(id('visibility')).extracted,
+            'flag': data.fetch(id('flag')).extracted,
+        }
+        data['body'] = ' '.join([
+            data['title'],
+            data['description'], 
+            data['author'],
+            data['alttag'],
+            ', '.join(data['keywords']),
+        ])
+        return data
+
 
 registerTile('content',
              'templates/revision.pt',
@@ -316,39 +313,10 @@ class RevisionAddForm(RevisionForm, Form):
     __plumbing__ = AddPart
     
     def save(self, widget, data):
-        media = self.model.__parent__.model
-        keys = [int(key) for key in media.keys()]
-        keys.sort()
-        if keys:
-            key = str(keys[-1] + 1)
-        else:
-            key = '0'
-        revision = Revision()
-        media[key] = revision
-        metadata = Metadata()
-        revision['metadata'] = metadata
-        file = data.fetch('revisionform.data').extracted
-        if not file:
-            payload = ''
-        else:
-            if isinstance(file, basestring):
-                payload = file
-            else:
-                payload = file['file'].read()
-                metadata.metatype = file['mimetype']
-                metadata.filename = file['filename']
-        revision['binary'] = Binary(payload=payload)
-        metadata.revision = key
-        metadata.uid = str(uuid.uuid4())
-        metadata.created = timestamp()
-        metadata.creator = authenticated_userid(self.request)
-        metadata.flag = 'draft'
-        metadata.url = '' # calculate tiny url for frontend
-        metadata.visibility = data.fetch('revisionform.visibility').extracted
-        self.set_metadata_from_form(metadata, data)
-        media()
-        self.index_metadata_in_solr(self.model.__parent__[key])
-
+        add_revision(self.request,
+                     self.model.__parent__,
+                     self.revision_data(data))
+        
 
 @tile('editform', interface=RevisionAdapter, permission="edit")
 class RevisionEditForm(RevisionForm, Form):
@@ -356,33 +324,6 @@ class RevisionEditForm(RevisionForm, Form):
     __plumbing__ = EditPart
     
     def save(self, widget, data):
-        metadata = self.model.metadata
-        file = data.fetch('revisionform.data').extracted
-        if not file:
-            payload = ''
-        else:
-            if isinstance(file, basestring):
-                payload = file
-            else:
-                payload = file['file'].read()
-                metadata.metatype = file['mimetype']
-                metadata.filename = file['filename']
-        self.model.model['binary'].payload = payload
-        if not metadata.creator:
-            metadata.creator = authenticated_userid(self.request)
-        flag = data.fetch('revisionform.flag').extracted
-        if flag == 'active' and metadata.flag == 'draft':
-            media = self.model.__parent__
-            for key in media.keys():
-                rev = media[key]
-                if rev.metadata.flag == 'active':
-                    rev.metadata.flag = 'frozen'
-                    rev()
-        metadata.flag = flag
-        visibility = data.fetch('revisionform.visibility').extracted
-        if flag == 'active':
-            visibility = 'anonymous'
-        metadata.visibility = visibility
-        self.set_metadata_from_form(metadata, data)
-        self.model()
-        self.index_metadata_in_solr(self.model)
+        update_revision(self.request,
+                        self.model,
+                        self.revision_data(data))
