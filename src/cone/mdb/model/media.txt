@@ -21,6 +21,11 @@ Media
     >>> repository.keys()
     ['a', 'b', 'c']
     
+    >>> repository['inexistent']
+    Traceback (most recent call last):
+      ...
+    KeyError: 'inexistent'
+    
     >>> media = repository['c']
     >>> media
     <MediaAdapter object 'c' at ...>

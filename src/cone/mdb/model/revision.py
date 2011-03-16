@@ -19,6 +19,8 @@ from cone.mdb.model.utils import (
 )
 from cone.mdb.solr import Metadata as SolrMetadata
 
+import logging
+logger = logging.getLogger('mdb')
 
 # valid metadata keys
 solr_whitelist = [
@@ -101,7 +103,9 @@ def index_metadata(config, revision):
                 continue
             # non indexed metadata is ignored
             if not key in solr_whitelist:
-                continue
+                # should not happen here because mdb metadata already protect
+                # XXX: clean up
+                continue                                    #pragma NO COVERAGE
             val = getattr(metadata, key)
             # convert value to solr accepted date format if dt instance
             if key in solr_date_keys:
@@ -114,9 +118,7 @@ def index_metadata(config, revision):
         solr_md = SolrMetadata(config, solr_whitelist, **md)
         solr_md()
     except Exception, e:
-        # logging
-        print e
-        # debug
+        logger.error("Error while indexing to solr: %s" % str(e))
         raise
 
 

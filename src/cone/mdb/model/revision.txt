@@ -1,9 +1,174 @@
 Revision
 ========
 
-::
+``set_metadata``::
+
+    >>> from node.ext.mdb import Metadata
+    >>> from cone.mdb.model.revision import set_metadata
+    >>> from datetime import datetime
+    >>> metadata = Metadata()
+    >>> data = dict((
+    ...     ('uid', '1'),
+    ...     ('author', 'max'),
+    ...     ('noset', 'val'),
+    ...     ('revision', '99'),
+    ...     ('created', datetime(2011, 3, 16)),
+    ...     ('modified', None),
+    ... ))
+    >>> set_metadata(metadata, data)
+    >>> metadata.keys()
+    ['revision', 'author', 'modified', 'created', 'uid']
+    
+    >>> metadata.author
+    'max'
+    
+    >>> metadata.uid
+    '1'
+
+``sorl_date``::
+
+    >>> from cone.mdb.model.revision import solr_date
+    >>> dt = datetime(2011, 3, 16)
+    >>> solr_date(dt)
+    '2011-03-16T00:00:00Z'
+    
+    >>> solr_date(None)
+
+``index_metadata``::
+
+    >>> from cone.mdb.model.revision import index_metadata
+    >>> from cone.mdb.model import solr_config
+    >>> from cone.app import root
+    >>> from node.ext.mdb import Revision
+    >>> revision = Revision()
+    >>> revision.__name__ = '0'
+    >>> revision['metadata'] = metadata
+    >>> config = solr_config(root)
+    >>> index_metadata(config, revision)
+    
+    >>> from cone.mdb.solr import Metadata as SolrMetadata
+    >>> from cone.mdb.model.revision import solr_whitelist
+    >>> solr_md = SolrMetadata(config, solr_whitelist, uid='1')
+    >>> solr_md.query()
+    >>> solr_md.keys()
+    ['path', 'author', 'created', 'uid', 'revision']
+    
+    >>> solr_md.path
+    '0'
+    
+    >>> solr_md.author
+    'max'
+    
+    >>> solr_md.uid
+    '1'
+    
+    >>> solr_md.revision
+    '0'
+    
+    >>> solr_md.created
+    '2011-03-16T00:00:00Z'
+    
+    >>> revision = Revision()
+    >>> revision.__name__ = '1'
+    >>> revision['metadata'] = Metadata()
+    >>> config = solr_config(root)
+    >>> index_metadata(config, revision)
+    Traceback (most recent call last):
+      ...
+    SolrError: [Reason: Document [null] missing required field: uid]
+
+``add_revision``::
+    
+    >>> from cone.mdb.model import add_revision
+    >>> from pyramid.testing import DummyRequest
+    
+    >>> request = DummyRequest()
+    
+    >>> layer.authenticate('andi')
+    
+    >>> media = root['repositories']['repo1']['a']
+    >>> data = {
+    ...     'title': 'Revision 3',
+    ...     'author': 'max3',
+    ...     'description': 'description3',
+    ...     'keywords': ['keyword_a_3', 'keyword_b_3'],
+    ...     'relations': [],
+    ...     'effective': datetime(2011, 3, 1),
+    ...     'expires': datetime(2011, 3, 31),
+    ...     'alttag': 'alttag3',
+    ...     'data': 'Contents from Textfile 3',
+    ...     'visibility': 'hidden',
+    ...     'flag': 'draft',
+    ... }
+    >>> data['body'] = ' '.join([
+    ...     data['title'],
+    ...     data['description'], 
+    ...     data['author'],
+    ...     data['alttag'],
+    ...     ', '.join(data['keywords']),
+    ... ])
+    >>> add_revision(request, media, data)
+    
+    >>> media.keys()
+    ['1', '0', '2']
+    
+``update_revision``::
+
+    >>> from cone.mdb.model import update_revision
+    >>> revision = media['0']
+    >>> data = {
+    ...     'title': 'Revision 99',
+    ...     'author': 'max99',
+    ...     'description': 'description99',
+    ...     'keywords': ['keyword_a_99', 'keyword_b_99'],
+    ...     'relations': [],
+    ...     'effective': datetime(2011, 3, 1),
+    ...     'expires': datetime(2011, 3, 31),
+    ...     'alttag': 'alttag99',
+    ...     'data': 'Contents from Textfile 99',
+    ...     'visibility': 'hidden',
+    ...     'flag': 'draft',
+    ... }
+    >>> data['body'] = ' '.join([
+    ...     data['title'],
+    ...     data['description'], 
+    ...     data['author'],
+    ...     data['alttag'],
+    ...     ', '.join(data['keywords']),
+    ... ])
+    
+    >>> update_revision(request, revision, data)
+
+``RevisionAdapter``::
 
     >>> from cone.app import root
     >>> revision = root['repositories']['repo1']['a']['0']
     >>> revision
     <RevisionAdapter object '0' at ...>
+    
+    >>> revision.metadata.title
+    'Revision 99'
+    
+    >>> revision.metadata.keys()
+    ['author', 'created', 'creator', 'url', 'expires', 'effective', 
+    'description', 'body', 'revision', 'flag', 'title', 'keywords', 
+    'relations', 'alttag', 'visibility', 'uid']
+    
+    >>> revision.properties.keys()
+    ['action_view', 'editable', 'in_navtree', 'action_up']
+    
+    >>> revision.properties.action_view
+    True
+    
+    >>> revision.properties.editable
+    True
+    
+    >>> revision.properties.in_navtree
+    True
+    
+    >>> revision.properties.action_up
+    True
+    
+    >>> [key for key in revision]
+    []
+    
