@@ -3,13 +3,13 @@ import interlude
 import pprint
 import unittest2 as unittest
 from plone.testing import layered
-from cone.app import testing
+from cone.mdb import testing
 
 optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.ELLIPSIS | \
               doctest.REPORT_ONLY_FIRST_FAILURE
 
-layer = testing.Security()
+layer = testing.Database()
 
 TESTFILES = [
 #    'amqp.txt',

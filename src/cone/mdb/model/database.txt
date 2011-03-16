@@ -7,21 +7,20 @@ Repositories database settings node
     <Database object 'database' at ...>
     
     >>> db.attrs.path
-    'var/repositories'
-    
-    >>> db()
+    '/tmp/...'
     
     >>> db.abspath
-    '/.../var/repositories'
+    '/tmp/...'
     
     >>> db.dbstatus
     'OK'
     
-    >>> db.attrs.path = ''
-    >>> db()
+    >>> layer.rebase('foo/bar')
+    >>> db.dbstatus
+    'Database path not exists - "/.../foo/bar"'
     
+    >>> layer.rebase('')
     >>> db.dbstatus
     'Database path not exists - ""'
     
-    >>> db.attrs.path = 'var/repositories'
-    >>> db()
+    >>> layer.recover()

@@ -7,4 +7,11 @@ DBLocation
     >>> from cone.mdb.model.utils import DBLocation
     >>> loc = DBLocation()
     >>> loc.dbpath
-    '/.../var/repositories'
+    '/tmp/...'
+    
+    >>> layer.rebase('foo/bar')
+    
+    >>> loc.dbpath
+    '/.../foo/bar'
+    
+    >>> layer.recover()
