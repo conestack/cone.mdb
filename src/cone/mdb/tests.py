@@ -12,11 +12,15 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 layer = testing.Security()
 
 TESTFILES = [
-    'amqp.txt',
+#    'amqp.txt',
     'solr.txt', # XXX: this test resets solr index!!!
-    'model/amqp.txt',
+#    'model/amqp.txt',
     'model/database.txt',
+    
+    'model/repositories.txt',
+    
     'model/solr.txt',
+    'model/utils.txt',
 ]
 
 def test_suite():

@@ -1,0 +1,80 @@
+Repositories
+============
+
+    >>> from cone.app import root
+
+Reporitories is a registered plugin on root::
+
+    >>> repositories = root['repositories']
+    >>> repositories
+    <Repositories object 'repositories' at ...>
+
+Configured properties::
+
+    >>> repositories.properties.keys()
+    ['editable', 'in_navtree']
+    
+    >>> repositories.properties.editable
+    False
+    
+    >>> repositories.properties.in_navtree = True
+
+Provided metadata::
+
+    >>> repositories.metadata.keys()
+    ['description', 'title']
+    
+    >>> repositories.metadata.description
+    'Container for Repositories'
+    
+    >>> repositories.metadata.title
+    'Repositories'
+
+Create dummy repositories container::
+
+    >>> import os
+    >>> import tempfile
+    >>> tempdir = tempfile.mkdtemp()
+    
+    >>> db = root['settings']['database']
+    >>> old_db_path = db.attrs.path
+    >>> db.attrs.path = tempdir
+    >>> db()
+    
+    >>> os.mkdir(os.path.join(tempdir, 'a'))
+    >>> os.mkdir(os.path.join(tempdir, 'b'))
+
+``keys``::
+
+    >>> repositories.keys()
+    ['a', 'b']
+
+``__iter__``::
+
+    >>> [key for key in repositories]
+    ['a', 'b']
+
+``__getitem__``::
+
+    >>> repositories['inexistent']
+    Traceback (most recent call last):
+      ...
+    KeyError: 'inexistent'
+    
+    >>> repositories['a']
+    <RepositoryAdapter object 'a' at ...>
+    
+    >>> b = repositories['b']
+    >>> b
+    <RepositoryAdapter object 'b' at ...>
+    
+    >>> repositories['b'] is b
+    True
+
+Cleanup dummy repositories container::
+
+    >>> db.attrs.path = old_db_path
+    >>> db()
+    
+    >>> import shutil
+    >>> shutil.rmtree(tempdir)

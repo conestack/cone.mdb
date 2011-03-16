@@ -1,0 +1,10 @@
+Utils
+=====
+
+DBLocation
+----------
+
+    >>> from cone.mdb.model.utils import DBLocation
+    >>> loc = DBLocation()
+    >>> loc.dbpath
+    '/.../var/repositories'

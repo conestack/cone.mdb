@@ -7,7 +7,7 @@ from cone.mdb.model.repositories import Repositories
 cone.app.cfg.css.protected.append('mdb-static/styles.css')
 
 cone.app.register_plugin_config('solr', Solr)
-cone.app.register_plugin_config('amqp', Amqp)
+#cone.app.register_plugin_config('amqp', Amqp)
 cone.app.register_plugin_config('database', Database)
 
 cone.app.register_plugin('repositories', Repositories)

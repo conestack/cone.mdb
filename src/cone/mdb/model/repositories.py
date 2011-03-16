@@ -19,20 +19,23 @@ class Repositories(BaseNode, DBLocation):
     
     @property
     def properties(self):
-        props = Properties()
-        props.in_navtree = True
-        props.editable = False
-        return props
+        if not hasattr(self, '_properties'):
+            props = Properties()
+            props.in_navtree = True
+            props.editable = False
+            self._properties = props
+        return self._properties
     
     @property
     def metadata(self):
-        metadata = BaseMetadata()
-        metadata.title = "Repositories"
-        metadata.description = "Your repositories"
-        return metadata
+        if not hasattr(self, '_metadata'):
+            metadata = BaseMetadata()
+            metadata.title = "Repositories"
+            metadata.description = "Container for Repositories"
+            self._metadata = metadata
+        return self._metadata
     
     def __iter__(self):
-        # XXX: filter by group memebership of user if not manager
         path = self.dbpath
         for repository in os.listdir(path):
             repositorypath = os.path.join(path, repository)

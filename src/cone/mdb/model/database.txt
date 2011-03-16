@@ -18,5 +18,10 @@ Repositories database settings node
     'OK'
     
     >>> db.attrs.path = ''
+    >>> db()
+    
     >>> db.dbstatus
     'Database path not exists - ""'
+    
+    >>> db.attrs.path = 'var/repositories'
+    >>> db()
