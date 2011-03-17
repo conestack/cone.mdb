@@ -1,0 +1,59 @@
+AMQP Settings form
+==================
+
+Check ACL::
+
+    >>> import cone.mdb.browser.amqp
+    >>> from cone.tile import render_tile
+    >>> from pyramid.testing import DummyRequest
+    >>> from cone.app import root
+    >>> amqp = root['settings']['amqp']
+
+Anonymous unauthorized::
+
+    >>> request = DummyRequest()
+    >>> res = render_tile(amqp, request, 'editform')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.mdb.browser.amqp.AmqpSettingsForm object at ...> 
+    failed permission check
+
+Unprivileged unauthorized::
+
+    >>> layer.authenticate('max')
+    >>> res = render_tile(amqp, request, 'editform')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.mdb.browser.amqp.AmqpSettingsForm object at ...> 
+    failed permission check
+
+Manager is allowed to edit settings::
+
+    >>> layer.authenticate('manager')
+    
+    >>> res = render_tile(amqp, request, 'editform')
+    >>> res.find('action="http://example.com/settings/amqp/edit"') > 0
+    True
+    
+    >>> request.params['amqpform.host'] = amqp.attrs.host
+    >>> request.params['amqpform.user'] = amqp.attrs.user
+    >>> request.params['amqpform.password'] = amqp.attrs.password
+    >>> request.params['amqpform.ssl'] = amqp.attrs.ssl
+    >>> request.params['amqpform.exchange'] = amqp.attrs.exchange
+    >>> request.params['amqpform.queue'] = amqp.attrs.queue
+    >>> request.params['amqpform.type'] = amqp.attrs.type
+    >>> request.params['amqpform.realm'] = amqp.attrs.realm
+    >>> request.params['action.amqpform.save'] = '1'
+    
+    >>> res = render_tile(amqp, request, 'editform')
+    >>> request.environ['redirect']
+    <HTTPFound at ... 302 Found>
+    
+    >>> request.params['ajax'] = '1'
+    >>> res = render_tile(amqp, request, 'editform')
+    >>> request.environ['cone.app.continuation']
+    [<cone.app.browser.ajax.AjaxAction object at ...>]
+
+    

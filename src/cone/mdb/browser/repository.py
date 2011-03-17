@@ -1,6 +1,5 @@
 import re
 from plumber import plumber
-from pyramid.security import authenticated_userid
 from yafowil.base import (
     factory,
     ExtractionError,
@@ -16,7 +15,6 @@ from cone.app.browser.authoring import (
     AddPart,
     EditPart,
 )
-from node.ext.mdb import Repository
 from cone.mdb.model import (
     RepositoryAdapter,
     add_repository,

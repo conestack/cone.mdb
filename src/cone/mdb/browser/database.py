@@ -1,11 +1,9 @@
 from plumber import plumber
-from webob.exc import HTTPFound
 from yafowil.base import factory
 from cone.tile import (
     tile,
     registerTile,
 )
-from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
 from cone.app.browser.settings import SettingsPart

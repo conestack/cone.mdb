@@ -1,17 +1,14 @@
 from plumber import plumber
-from webob.exc import HTTPFound
 from yafowil.base import factory
 from cone.tile import (
     tile,
     registerTile,
 )
-from cone.app.browser.ajax import AjaxAction
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
 from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
 from cone.mdb.model import Amqp
-from cone.mdb import amqp
 
 
 registerTile('content',
@@ -113,4 +110,3 @@ class AmqpSettingsForm(Form):
         self.model.attrs.type = data.fetch(id('type')).extracted
         self.model.attrs.realm = data.fetch(id('realm')).extracted
         self.model()
-        amqp.consumer = amqp.create_consumer()
