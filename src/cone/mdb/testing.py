@@ -5,14 +5,12 @@ import pyramid_zcml
 from plone.testing import Layer
 from pyramid.testing import DummyRequest
 from cone.app import root
-from cone.app.testing import Security
+from cone.app.testing import security
 from cone.mdb.model import (
     add_repository,
     add_media,
     add_revision,
 )
-
-security = Security()
 
 
 class Database(Layer):
