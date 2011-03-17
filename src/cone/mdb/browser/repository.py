@@ -90,8 +90,7 @@ class RepositoryForm(object):
         id = self.request.params.get('repositoryform.id')
         if id and not re.match('^[a-zA-Z0-9]', id):
             raise ExtractionError(u'Id contains illegal characters')
-        # XXX: validation of existing fails right now...
-        if id in self.model.keys():
+        if id in self.model.__parent__.keys():
             raise ExtractionError(u'Repository "%s" already exists' % id)
         return id
 

@@ -68,16 +68,10 @@ Add::
     >>> res.find('Id contains illegal characters') > -1
     True
     
-# XXX: validation of existing fails right now...::
-    
-    >> request.params['repositoryform.id'] = 'repo1'
-    >> res = render_tile(repositories, request, 'add')
-    >> res
-    
-    >> res.find('Repository "repo1" already exists') > -1
+    >>> request.params['repositoryform.id'] = 'repo1'
+    >>> res = render_tile(repositories, request, 'add')
+    >>> res.find('Repository "repo1" already exists') > -1
     True
-    
-# / XXX::
 
     >>> request.params['repositoryform.id'] = 'repo4'
     >>> res = render_tile(repositories, request, 'add')
@@ -87,6 +81,35 @@ Add::
     >>> request.environ['redirect']
     <HTTPFound at ... 302 Found>
     
+    >>> repository = repositories['repo4']
+    >>> repository.__name__
+    'repo4'
+    
+    >>> repository.metadata.title
+    u'Repository title'
+    
+    >>> repository.metadata.description
+    u''
+    
 Edit::
+
+    >>> request = DummyRequest()
+    >>> res = render_tile(repository, request, 'edit')
+    >>> expected = '<form action="http://example.com/repositories/repo4/edit"'
+    >>> res.find(expected) > -1
+    True
+    
+    >>> request.params['repositoryform.title'] = u'Other repository title'
+    >>> request.params['repositoryform.description'] = u'Repository description'
+    >>> request.params['action.repositoryform.save'] = '1'
+    >>> res = render_tile(repository, request, 'edit')
+    >>> res
+    u''
+    
+    >>> repository.metadata.title
+    u'Other repository title'
+    
+    >>> repository.metadata.description
+    u'Repository description'
 
     >>> layer.logout()
