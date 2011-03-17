@@ -237,21 +237,31 @@ class RevisionForm(object):
         if isinstance(relations, basestring):
             relations = [relations]
         return relations
+    
+    def _field_id(self, s):
+        return u'%s.%s' % (self.form_name, s)
+    
+    def _save_val(self, val):
+        if val is UNSET:
+            return u''
+        return val
+    
+    def _fetch(self, data, name):
+        return self._save_val(data.fetch(self._field_id(name)).extracted)
 
     def revision_data(self, data):
-        def id(s):
-            return '%s.%s' % (self.form_name, s)
+        f = self._fetch
         data = {
-            'title': data.fetch(id('title')).extracted,
-            'author': data.fetch(id('author')).extracted,
-            'description': data.fetch(id('description')).extracted,
-            'keywords': data.fetch(id('keywords')).extracted,
-            'relations': data.fetch(id('relations')).extracted,
-            'effective': data.fetch(id('effective')).extracted,
-            'expires': data.fetch(id('expires')).extracted,
-            'alttag': data.fetch(id('alttag')).extracted,
-            'data': data.fetch(id('data')).extracted,
-            'visibility': data.fetch(id('visibility')).extracted,
+            'title': f(data, u'title'),
+            'author': f(data, u'author'),
+            'description': f(data, u'description'),
+            'keywords': f(data, u'keywords'),
+            'relations': f(data, u'relations'),
+            'effective': f(data, u'effective'),
+            'expires': f(data, u'expires'),
+            'alttag': f(data, u'alttag'),
+            'data': f(data, u'data'),
+            'visibility': f(data, u'visibility'),
         }
         data['body'] = ' '.join([
             data['title'],

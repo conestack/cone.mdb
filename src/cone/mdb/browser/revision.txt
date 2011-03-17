@@ -27,5 +27,42 @@ Authenticated::
     >>> res = render_tile(revision, request, 'content')
     >>> res.find('Revision 99') > -1
     True
+
+Add::
+
+    >>> import cone.app.browser.referencebrowser
+    >>> request.params['factory'] = 'revision'
+    >>> media = revision.__parent__
+    >>> res = render_tile(media, request, 'add')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.app.browser.authoring.AddTile object at ...> 
+    failed permission check
+    
+    >>> layer.authenticate('editor')
+    >>> res = render_tile(media, request, 'add')
+    >>> expected = '<form action="http://example.com/repositories/repo1/a/add"'
+    >>> res.find(expected) > -1
+    True
+    
+    >>> request.params['revisionform.visibility'] = 'hidden'
+    >>> request.params['revisionform.title'] = ''
+    >>> request.params['revisionform.author'] = ''
+    >>> request.params['revisionform.description'] = ''
+    >>> request.params['revisionform.keywords'] = ''
+    >>> request.params['revisionform.relations'] = ''
+    >>> request.params['revisionform.effective'] = ''
+    >>> request.params['revisionform.expires'] = ''
+    >>> request.params['revisionform.alttag'] = ''
+    >>> request.params['revisionform.data'] = ''
+    >>> request.params['action.revisionform.save'] = '1'
+    
+    >>> res = render_tile(media, request, 'add')
+    >>> res.find('No revision title given') > -1
+    True
+    
+    >>> res.find('No file uploaded') > -1
+    True
     
     >>> layer.logout()
