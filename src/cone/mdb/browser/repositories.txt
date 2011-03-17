@@ -1,0 +1,35 @@
+Repositories
+============
+
+::
+
+    >>> from cone.app import root
+    >>> from cone.tile import render_tile
+    >>> from pyramid.testing import DummyRequest
+    
+    >>> import cone.app.browser.login
+    >>> import cone.app.browser.contents
+    >>> import cone.mdb.browser.repositories
+    >>> repositories = root['repositories']
+    >>> request = DummyRequest()
+
+Unauthenticated renders login form::
+
+    >>> res = render_tile(repositories, request, 'content')
+    >>> res.find('<form action="http://example.com/repositories/login"') > -1
+    True
+
+Authenticated lists repositories::
+
+    >>> layer.authenticate('max')
+    >>> res = render_tile(repositories, request, 'content')
+    >>> res.find('href="http://example.com/repositories/repo1"') > -1
+    True
+    
+    >>> res.find('href="http://example.com/repositories/repo2"') > -1
+    True
+    
+    >>> res.find('href="http://example.com/repositories/repo3"') > -1
+    True
+    
+    >>> layer.logout()

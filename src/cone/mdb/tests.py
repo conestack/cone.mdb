@@ -26,6 +26,7 @@ TESTFILES = [
     'browser/database.txt',
     'browser/solr.txt',
     'browser/livesearch.txt',
+    'browser/repositories.txt',
 ]
 
 def test_suite():

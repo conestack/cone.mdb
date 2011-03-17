@@ -24,3 +24,5 @@ Licesearch callback to solr
     {'target': 'http://example.com/.../repo1/a/1', 
     'value': 'Revision', 
     'label': 'Revision 1'}]
+
+    >>> layer.logout()
