@@ -1,0 +1,111 @@
+Media
+=====
+
+::
+
+    >>> from cone.app import root
+    >>> from cone.tile import render_tile
+    >>> from pyramid.testing import DummyRequest
+    
+    >>> import cone.app.browser.login
+    >>> import cone.app.browser.contents
+    >>> import cone.mdb.browser.media
+    >>> media = root['repositories']['repo1']['a']
+    >>> request = DummyRequest()
+
+Unauthenticated renders login form::
+
+    >>> res = render_tile(media, request, 'content')
+    >>> expected = \
+    ...     '<form action="http://example.com/repositories/repo1/a/login"'
+    >>> res.find(expected) > -1
+    True
+
+Authenticated view shows active revision::
+
+    >>> layer.authenticate('max')
+    >>> res = render_tile(media, request, 'content')
+    >>> res.find('Active revision') > -1
+    True
+    
+    >>> expected = 'href="http://example.com/repositories/repo1/a/1/download"'
+    >>> res.find(expected) > -1
+    True
+
+Listing lists revisions of media::
+
+    >>> res = render_tile(media, request, 'listing')
+    >>> res.find('href="http://example.com/repositories/repo1/a/0"') > -1
+    True
+    
+    >>> res.find('href="http://example.com/repositories/repo1/a/1"') > -1
+    True
+    
+    >>> res.find('href="http://example.com/repositories/repo1/a/2"') > -1
+    True
+
+Add::
+    
+    >>> request.params['factory'] = 'media'
+    >>> repository = media.__parent__
+    >>> res = render_tile(repository, request, 'add')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.app.browser.authoring.AddTile object at ...> 
+    failed permission check
+    
+    >>> layer.authenticate('editor')
+    >>> res = render_tile(repository, request, 'add')
+    >>> expected = '<form action="http://example.com/repositories/repo1/add"'
+    >>> res.find(expected) > -1
+    True
+    
+    >>> request.params['mediaform.title'] = ''
+    >>> request.params['mediaform.description'] = ''
+    >>> request.params['action.mediaform.save'] = '1'
+    
+    >>> res = render_tile(repository, request, 'add')
+    >>> res.find('No media title given') > -1
+    True
+    
+    >>> request.params['mediaform.title'] = 'Media title'
+    >>> res = render_tile(repository, request, 'add')
+    >>> res
+    u''
+    
+    >>> request.environ['redirect']
+    <HTTPFound at ... 302 Found>
+    
+    >>> repository.keys()
+    ['a', 'b', 'c', 'd']
+    
+    >>> media = repository['d']
+    >>> media.metadata.title
+    u'Media title'
+    
+    >>> media.metadata.description
+    u''
+
+Edit::
+
+    >>> request = DummyRequest()
+    >>> res = render_tile(media, request, 'edit')
+    >>> expected = '<form action="http://example.com/repositories/repo1/d/edit"'
+    >>> res.find(expected) > -1
+    True
+    
+    >>> request.params['mediaform.title'] = u'Other media title'
+    >>> request.params['mediaform.description'] = u'Media description'
+    >>> request.params['action.mediaform.save'] = '1'
+    >>> res = render_tile(media, request, 'edit')
+    >>> res
+    u''
+    
+    >>> media.metadata.title
+    u'Other media title'
+    
+    >>> media.metadata.description
+    u'Media description'
+
+    >>> layer.logout()

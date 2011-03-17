@@ -28,6 +28,7 @@ TESTFILES = [
     'browser/livesearch.txt',
     'browser/repositories.txt',
     'browser/repository.txt',
+    'browser/media.txt',
 ]
 
 def test_suite():
