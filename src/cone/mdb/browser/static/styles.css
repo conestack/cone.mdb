@@ -48,12 +48,15 @@ ul#mainmenu li.node-repositories a.current_page_item {
 .revisiondetails .anonymous {
     color:green;
 }
+.state-working_copy,
 .revisiondetails .working_copy {
     color:orange;
 }
+.state-active,
 .revisiondetails .active {
     color:green;
 }
+.state_frozen,
 .revisiondetails .frozen {
     color:red;
 }

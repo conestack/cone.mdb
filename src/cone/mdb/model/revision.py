@@ -60,6 +60,15 @@ sorl_non_metadata_keys = [
     'revision',
 ]
 
+# XXX: via i18n
+transition_names = {
+    'working_copy_2_active': 'Set active',
+    'active_2_working_copy': 'Make editable',
+    'active_2_frozen': 'Freeze',
+    'working_copy_2_frozen': 'Freeze',
+    'frozen_2_working_copy': 'Make editable',
+}
+
 
 def persist_state(revision, info):
     """Transition callback for repoze.workflow
@@ -237,6 +246,9 @@ class RevisionAdapter(AdapterNode):
         props.action_view = True
         props.wf_state = True
         props.wf_name = u'revision'
+        # XXX: check in repoze.workflow the intended way for naming
+        #      transitions
+        props.wf_transition_names = transition_names
         return props
     
     @property

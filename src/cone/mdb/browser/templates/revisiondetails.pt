@@ -9,7 +9,7 @@
     
     <table class="revisiondetails">
       <tr>
-        <td class="labelcol">Flag</td>
+        <td class="labelcol">State</td>
         <td class="${metadata.flag}"
             tal:content="metadata.flag">working_copy</td>
       </tr>

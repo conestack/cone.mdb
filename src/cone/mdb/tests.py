@@ -29,6 +29,7 @@ TESTFILES = [
     'browser/repositories.txt',
     'browser/repository.txt',
     'browser/media.txt',
+    'browser/revision.txt',
 ]
 
 def test_suite():

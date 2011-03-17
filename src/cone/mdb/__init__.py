@@ -5,6 +5,7 @@ from cone.mdb.model.database import Database
 from cone.mdb.model.repositories import Repositories
 
 cone.app.cfg.css.protected.append('mdb-static/styles.css')
+cone.app.cfg.js.protected.append('mdb-static/mdb.js')
 
 cone.app.register_plugin_config('solr', Solr)
 cone.app.register_plugin_config('amqp', Amqp)
