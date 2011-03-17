@@ -55,7 +55,7 @@ class RepositoryForm(object):
             'field:label:error:text',
             value = self.model.metadata.title,
             props = {
-                'required': 'No media title given',
+                'required': 'No repository title given',
                 'label': 'Repository title',
             })
         form['description'] = factory(
@@ -90,6 +90,7 @@ class RepositoryForm(object):
         id = self.request.params.get('repositoryform.id')
         if id and not re.match('^[a-zA-Z0-9]', id):
             raise ExtractionError(u'Id contains illegal characters')
+        # XXX: validation of existing fails right now...
         if id in self.model.keys():
             raise ExtractionError(u'Repository "%s" already exists' % id)
         return id

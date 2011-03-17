@@ -1,0 +1,92 @@
+Repository
+==========
+
+::
+
+    >>> from cone.app import root
+    >>> from cone.tile import render_tile
+    >>> from pyramid.testing import DummyRequest
+    
+    >>> import cone.app.browser.login
+    >>> import cone.app.browser.contents
+    >>> import cone.mdb.browser.repository
+    >>> repository = root['repositories']['repo1']
+    >>> request = DummyRequest()
+
+Unauthenticated renders login form::
+
+    >>> res = render_tile(repository, request, 'content')
+    >>> expected = '<form action="http://example.com/repositories/repo1/login"'
+    >>> res.find(expected) > -1
+    True
+
+Authenticated view lists media of repository::
+
+    >>> layer.authenticate('max')
+    >>> res = render_tile(repository, request, 'content')
+    >>> res.find('href="http://example.com/repositories/repo1/a"') > -1
+    True
+    
+    >>> res.find('href="http://example.com/repositories/repo1/b"') > -1
+    True
+    
+    >>> res.find('href="http://example.com/repositories/repo1/c"') > -1
+    True
+
+Add::
+
+    >>> request.params['factory'] = 'repository'
+    >>> repositories = repository.__parent__
+    >>> res = render_tile(repositories, request, 'add')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.app.browser.authoring.AddTile object at ...> 
+    failed permission check
+    
+    >>> layer.authenticate('editor')
+    >>> res = render_tile(repositories, request, 'add')
+    >>> res.find('<form action="http://example.com/repositories/add"') > -1
+    True
+    
+    >>> request.params['repositoryform.id'] = ''
+    >>> request.params['repositoryform.title'] = ''
+    >>> request.params['repositoryform.description'] = ''
+    >>> request.params['action.repositoryform.save'] = '1'
+    
+    >>> res = render_tile(repositories, request, 'add')
+    >>> res.find('No repository id given') > -1
+    True
+    
+    >>> res.find('No repository title given') > -1
+    True
+    
+    >>> request.params['repositoryform.id'] = '???'
+    >>> request.params['repositoryform.title'] = 'Repository title'
+    
+    >>> res = render_tile(repositories, request, 'add')
+    >>> res.find('Id contains illegal characters') > -1
+    True
+    
+# XXX: validation of existing fails right now...::
+    
+    >> request.params['repositoryform.id'] = 'repo1'
+    >> res = render_tile(repositories, request, 'add')
+    >> res
+    
+    >> res.find('Repository "repo1" already exists') > -1
+    True
+    
+# / XXX::
+
+    >>> request.params['repositoryform.id'] = 'repo4'
+    >>> res = render_tile(repositories, request, 'add')
+    >>> res
+    u''
+    
+    >>> request.environ['redirect']
+    <HTTPFound at ... 302 Found>
+    
+Edit::
+
+    >>> layer.logout()
