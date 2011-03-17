@@ -5,31 +5,19 @@ from pyramid.interfaces import IResponseFactory
 from pyramid.view import view_config
 from yafowil.base import (
     factory,
-    ExtractionError,
     UNSET,
 )
 from cone.tile import (
     tile,
-    render_tile,
     registerTile,
     Tile,
 )
-from pyramid.security import authenticated_userid
-from cone.app.browser.utils import (
-    make_url,
-    nodepath,
-    format_date,
-)
+from cone.app.browser.utils import make_url
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
 from cone.app.browser.authoring import (
     AddPart,
     EditPart,
-)
-from node.ext.mdb import (
-    Revision,
-    Metadata,
-    Binary,
 )
 from cone.mdb.model import (
     RevisionAdapter,
@@ -96,13 +84,6 @@ class RevisionForm(object):
                 'label': 'Visibility',
                 'vocabulary': self.visibility_vocab,
             })
-        form['flag'] = factory(
-            'field:label:error:select',
-            value = metadata.flag,
-            props = {
-                'label': 'Flag',
-                'vocabulary': self.flag_vocab,
-            })
         form['title'] = factory(
             'field:label:error:text',
             value = metadata.title,
@@ -168,6 +149,7 @@ class RevisionForm(object):
             props = {
                 'label': 'Alt Tag for publishing',
             })
+        # XXX: rename to file somewhen
         form['data'] = factory(
             'field:label:error:file',
             value = self.data_value,
@@ -198,32 +180,12 @@ class RevisionForm(object):
     
     @property
     def visibility_vocab(self):
-        """XXX: available transitions
-        """
-        if self.action_resource == 'add' or self.model.metadata.flag == 'draft':
-            return [('hidden', 'hidden')]
+        if self.model.state == u'active':
+            return [('anonymous', 'Anonymous')]
         return [
             ('hidden', 'Hidden'),
             ('anonymous', 'Anonymous'),
         ]
-        
-    @property
-    def flag_vocab(self):
-        """XXX: available transitions
-        """
-        if self.action_resource == 'add':
-            return [('draft', 'Draft')]
-        if self.model.metadata.flag == 'draft':
-            return [
-                ('draft', 'Draft'),
-                ('active', 'Active'),
-            ]
-        if self.model.metadata.flag == 'active':
-            return [
-                ('active', 'Active'),
-            ]
-        if self.model.metadata.flag == 'frozen':
-            return [('frozen', 'Frozen')]
     
     @property
     def relations_vocab(self):
@@ -290,7 +252,6 @@ class RevisionForm(object):
             'alttag': data.fetch(id('alttag')).extracted,
             'data': data.fetch(id('data')).extracted,
             'visibility': data.fetch(id('visibility')).extracted,
-            'flag': data.fetch(id('flag')).extracted,
         }
         data['body'] = ' '.join([
             data['title'],

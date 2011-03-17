@@ -98,7 +98,6 @@ Revision
     ...     'alttag': 'alttag3',
     ...     'data': 'Contents from Textfile 3',
     ...     'visibility': 'hidden',
-    ...     'flag': 'draft',
     ... }
     >>> data['body'] = ' '.join([
     ...     data['title'],
@@ -127,7 +126,6 @@ Revision
     ...     'alttag': 'alttag99',
     ...     'data': 'Contents from Textfile 99',
     ...     'visibility': 'hidden',
-    ...     'flag': 'draft',
     ... }
     >>> data['body'] = ' '.join([
     ...     data['title'],
@@ -155,7 +153,8 @@ Revision
     'relations', 'alttag', 'visibility', 'uid']
     
     >>> revision.properties.keys()
-    ['action_view', 'editable', 'in_navtree', 'action_up']
+    ['wf_name', 'editable', 'action_view', 
+    'action_up', 'in_navtree', 'wf_state']
     
     >>> revision.properties.action_view
     True
@@ -172,3 +171,115 @@ Revision
     >>> [key for key in revision]
     []
     
+    >>> revision.properties.wf_name
+    u'revision'
+    
+    >>> revision.properties.wf_state
+    True
+    
+    >>> layer.logout()
+
+Revision Workflow::
+
+    >>> from cone.mdb.model import RevisionAdapter
+    >>> request = DummyRequest()
+
+Lookup workflow::
+
+    >>> from repoze.workflow import get_workflow
+    >>> workflow = get_workflow(RevisionAdapter, revision.properties.wf_name)
+    >>> workflow
+    <repoze.workflow.workflow.Workflow object at ...>
+
+initialize workflow::
+
+    >>> state = workflow.initialize(revision)
+    >>> revision.state
+    u'working_copy'
+
+we're anonymous, no transition::
+
+    >>> workflow.get_transitions(revision, request, from_state=u'working_copy')
+    []
+    
+    >>> from pyramid.security import has_permission
+    >>> has_permission('edit', revision, request)
+    <ACLDenied instance at ...
+    
+    >>> workflow.transition(revision, request, 'working_copy_2_active')
+    Traceback (most recent call last):
+      ...
+    WorkflowError: edit permission required for transition 
+    using 'working_copy_2_active'
+
+authenticate as unprivileged user and try again::
+
+    >>> layer.authenticate('max')
+    >>> has_permission('edit', revision, request)
+    <ACLDenied instance at ...
+    
+    >>> workflow.get_transitions(revision, request, from_state=u'working_copy')
+    []
+    
+    >>> workflow.transition(revision, request, 'working_copy_2_active')
+    Traceback (most recent call last):
+      ...
+    WorkflowError: edit permission required for transition 
+    using 'working_copy_2_active'
+
+'editor' user has 'edit' permission::
+
+    >>> layer.authenticate('editor')
+    >>> has_permission('edit', revision, request)
+    <ACLAllowed instance at ...
+    
+    >>> transitions = workflow.get_transitions(
+    ...     revision, request, from_state=revision.state)
+    >>> [tr['name'] for tr in transitions]
+    [u'working_copy_2_active', u'working_copy_2_frozen']
+    
+    >>> workflow.transition(revision, request, 'working_copy_2_active')
+    >>> revision.state
+    u'active'
+    
+    >>> transitions = workflow.get_transitions(
+    ...     revision, request, from_state=revision.state)
+    >>> [tr['name'] for tr in transitions]
+    [u'active_2_working_copy', u'active_2_frozen']
+    
+    >>> workflow.transition(revision, request, 'active_2_working_copy')
+    >>> revision.state
+    u'working_copy'
+    
+    >>> workflow.transition(revision, request, 'working_copy_2_frozen')
+    >>> revision.state
+    u'frozen'
+
+Only 'manager' is allowed to perform a transition from 'frozen'::
+
+    >>> transitions = workflow.get_transitions(
+    ...     revision, request, from_state=revision.state)
+    >>> [tr['name'] for tr in transitions]
+    []
+    
+    >>> has_permission('manage', revision, request)
+    <ACLDenied instance at ...
+    
+    >>> workflow.transition(revision, request, 'frozen_2_working_copy')
+    Traceback (most recent call last):
+      ...
+    WorkflowError: manage permission required for transition 
+    using 'frozen_2_working_copy'
+    
+    >>> layer.authenticate('manager')
+    >>> revision.state
+    u'frozen'
+    
+    >>> transitions = workflow.get_transitions(
+    ...     revision, request, from_state=revision.state)
+    >>> [tr['name'] for tr in transitions]
+    [u'frozen_2_working_copy']
+    
+    >>> workflow.transition(revision, request, 'frozen_2_working_copy')
+    >>> revision.state
+    u'working_copy'

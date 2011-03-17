@@ -57,7 +57,6 @@ class Database(Layer):
                 'alttag': 'alttag %i' % i,
                 'data': 'Contents from Textfile %i' % i,
                 'visibility': 'hidden',
-                'flag': 'draft',
             }
             data['body'] = ' '.join([
                 data['title'],

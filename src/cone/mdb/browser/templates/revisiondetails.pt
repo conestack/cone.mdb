@@ -11,7 +11,7 @@
       <tr>
         <td class="labelcol">Flag</td>
         <td class="${metadata.flag}"
-            tal:content="metadata.flag">draft</td>
+            tal:content="metadata.flag">working_copy</td>
       </tr>
       <tr>
         <td class="labelcol">Visibility</td>

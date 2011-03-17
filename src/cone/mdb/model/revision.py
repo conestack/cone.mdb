@@ -1,6 +1,7 @@
 import uuid
 import datetime
 from pyramid.security import authenticated_userid
+from repoze.workflow import get_workflow
 from cone.app.model import (
     Properties,
     AdapterNode,
@@ -39,7 +40,7 @@ solr_whitelist = [
     'description',
     'alttag',
     'body',
-    'flag',
+    'flag', # XXX: rename to state somewhen
     'visibility',
     'path',
     'modified',
@@ -57,6 +58,13 @@ sorl_non_metadata_keys = [
     'path',
     'revision',
 ]
+
+
+def persist_state(revision, info):
+    """Transition callback for repoze.workflow
+    """
+    revision()
+    index_metadata(solr_config(revision), revision.model)
 
 
 def set_metadata(metadata, data):
@@ -82,7 +90,7 @@ def set_binary(revision, data):
         dict containing revision data
     """
     metadata = revision['metadata']
-    file = data['data']
+    file = data['data'] # XXX: rename to file somewhen
     if not file:
         payload = ''
     else:
@@ -170,15 +178,17 @@ def add_revision(request, media, data):
     metadata.created = timestamp()
     metadata.creator = authenticated_userid(request)
     
-    # XXX: repoze.workflow
-    metadata.flag = 'draft'
-    
-    metadata.url = '' # calculate tiny url for frontend
-    metadata.visibility = data['visibility']
-    metadata.body = data['body']
+    # XXX: Calculate tiny url for frontend
+    metadata.url = ''
     
     set_binary(revision, data)
     set_metadata(metadata, data)
+    
+    revision_adapter = media[revision.__name__]
+    wf_name = revision_adapter.properties.wf_name
+    workflow = get_workflow(RevisionAdapter, wf_name)
+    workflow.initialize(revision_adapter)
+    
     media()
     index_metadata(solr_config(media), revision)
 
@@ -196,24 +206,6 @@ def update_revision(request, revision, data):
     metadata = revision.metadata
     if not metadata.creator:
         metadata.creator = authenticated_userid(request)
-    flag = data['flag']
-    
-    # XXX repoze.workflow callback
-    if flag == 'active' and metadata.flag == 'draft':
-        media = revision.__parent__
-        for key in media.keys():
-            rev = media[key]
-            if rev.metadata.flag == 'active':
-                rev.metadata.flag = 'frozen'
-                rev()
-    metadata.flag = flag
-    
-    visibility = data['visibility']
-    if flag == 'active':
-        visibility = 'anonymous'
-    metadata.visibility = visibility
-    metadata.body = data['body']
-    
     set_binary(revision.model, data)
     set_metadata(metadata, data)
     revision()
@@ -228,10 +220,12 @@ class RevisionAdapter(AdapterNode):
     def properties(self):
         props = Properties()
         props.in_navtree = True
-        flag = self.metadata.flag
-        props.editable = flag == 'draft' and True or False
+        flag = self.state
+        props.editable = flag == u'working_copy' and True or False
         props.action_up = True
         props.action_view = True
+        props.wf_state = True
+        props.wf_name = u'revision'
         return props
     
     @property
@@ -241,6 +235,14 @@ class RevisionAdapter(AdapterNode):
             if metadata:
                 return metadata
         return Properties()                                 #pragma NO COVERAGE
+    
+    def _get_state(self):
+        return self.metadata.flag
+    
+    def _set_state(self, val):
+        self.metadata.flag = val
+    
+    state = property(_get_state, _set_state)
     
     def __iter__(self):
         return iter(list())
@@ -257,39 +259,3 @@ info.description = 'A revision.'
 info.node = RevisionAdapter
 info.addables = []
 registerNodeInfo('revision', info)
-
-
-###
-# workflow related
-
-def state_working_copy(content, info):
-    print content
-    print info
-
-def state_active(content, info):
-    print content
-    print info
-
-def state_frozen(content, info):
-    print content
-    print info
-
-def working_copy_2_active(content, info):
-    print content
-    print info
-
-def active_2_working_copy(content, info):
-    print content
-    print info
-
-def active_2_frozen(content, info):
-    print content
-    print info
-
-def working_copy_2_frozen(content, info):
-    print content
-    print info
-
-def frozen_2_working_copy(content, info):
-    print content
-    print info

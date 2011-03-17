@@ -48,7 +48,7 @@ ul#mainmenu li.node-repositories a.current_page_item {
 .revisiondetails .anonymous {
     color:green;
 }
-.revisiondetails .draft {
+.revisiondetails .working_copy {
     color:orange;
 }
 .revisiondetails .active {

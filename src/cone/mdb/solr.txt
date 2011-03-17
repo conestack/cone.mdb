@@ -44,7 +44,7 @@ Add test entry::
     ...   'description': 'description',
     ...   'alttag': 'alttag',
     ...   'body': ['body text 1', 'body text 2'],
-    ...   'flag': 'draft',
+    ...   'flag': 'working_copy',
     ...   'visibility': 'hidden',
     ...   'path': '/bla/bla',
     ...   'modified': datetime.now(),
@@ -63,7 +63,7 @@ Query already added entry::
     description: description
     effective: ...
     expires: ...
-    flag: draft
+    flag: working_copy
     keywords: ['a', 'b', 'c']
     metatype: text/plain
     modified: ...
