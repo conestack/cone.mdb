@@ -1,0 +1,54 @@
+Solr Settings form
+==================
+
+Check ACL::
+
+    >>> import cone.mdb.browser.solr
+    >>> from cone.tile import render_tile
+    >>> from pyramid.testing import DummyRequest
+    >>> from cone.app import root
+    >>> solr = root['settings']['solr']
+
+Anonymous unauthorized::
+
+    >>> request = DummyRequest()
+    >>> res = render_tile(solr, request, 'editform')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.mdb.browser.solr.SolrSettingsForm object at ...> 
+    failed permission check
+
+Unprivileged unauthorized::
+
+    >>> layer.authenticate('max')
+    >>> res = render_tile(solr, request, 'editform')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.mdb.browser.solr.SolrSettingsForm object at ...> 
+    failed permission check
+
+Manager is allowed to edit settings::
+
+    >>> layer.authenticate('manager')
+    
+    >>> res = render_tile(solr, request, 'editform')
+    >>> res.find('action="http://example.com/settings/solr/edit"') > 0
+    True
+    
+    >>> request.params['solrform.server'] = solr.attrs.server
+    >>> request.params['solrform.port'] = solr.attrs.port
+    >>> request.params['solrform.basepath'] = solr.attrs.basepath
+    >>> request.params['action.solrform.save'] = '1'
+    
+    >>> res = render_tile(solr, request, 'editform')
+    >>> request.environ['redirect']
+    <HTTPFound at ... 302 Found>
+    
+    >>> request.params['ajax'] = '1'
+    >>> res = render_tile(solr, request, 'editform')
+    >>> request.environ['cone.app.continuation']
+    [<cone.app.browser.ajax.AjaxAction object at ...>]
+    
+    >>> layer.logout()

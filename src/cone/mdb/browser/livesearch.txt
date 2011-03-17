@@ -1,0 +1,26 @@
+Licesearch callback to solr
+===========================
+
+::
+
+    >>> from cone.mdb.browser.livesearch import  solr_livesearch_callback
+    >>> from cone.app import root
+    >>> from pyramid.testing import DummyRequest
+    
+    >>> request = DummyRequest()
+    >>> request.params['term'] = 'Revision'
+    
+    >>> solr_livesearch_callback(root, request)
+    []
+    
+    >>> layer.authenticate('max')
+    >>> solr_livesearch_callback(root, request)
+    [{'target': 'http://example.com/.../repo1/a/2', 
+    'value': 'Revision', 
+    'label': 'Revision 3'}, 
+    {'target': 'http://example.com/.../repo1/a/0', 
+    'value': 'Revision', 
+    'label': 'Revision 99'}, 
+    {'target': 'http://example.com/.../repo1/a/1', 
+    'value': 'Revision', 
+    'label': 'Revision 1'}]
