@@ -1,6 +1,7 @@
 import uuid
 import datetime
 from pyramid.security import authenticated_userid
+from pyramid.threadlocal import get_current_request
 from repoze.workflow import get_workflow
 from cone.app.model import (
     Properties,
@@ -63,6 +64,16 @@ sorl_non_metadata_keys = [
 def persist_state(revision, info):
     """Transition callback for repoze.workflow
     """
+    if info.transition[u'to_state'] == u'active':
+        media = revision.__parent__
+        for val in media.values():
+            if val is revision:
+                continue
+            if val.state == u'active':
+                # XXX: try to get rid of get_current_request
+                request = get_current_request()
+                workflow = info.workflow
+                workflow.transition(val, request, u'active_2_working_copy')
     revision()
     index_metadata(solr_config(revision), revision.model)
 

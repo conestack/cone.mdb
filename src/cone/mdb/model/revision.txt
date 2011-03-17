@@ -191,13 +191,13 @@ Lookup workflow::
     >>> workflow
     <repoze.workflow.workflow.Workflow object at ...>
 
-initialize workflow::
+Initialize workflow::
 
     >>> state = workflow.initialize(revision)
     >>> revision.state
     u'working_copy'
 
-we're anonymous, no transition::
+We're anonymous, no transition::
 
     >>> workflow.get_transitions(revision, request, from_state=u'working_copy')
     []
@@ -212,7 +212,7 @@ we're anonymous, no transition::
     WorkflowError: edit permission required for transition 
     using 'working_copy_2_active'
 
-authenticate as unprivileged user and try again::
+Authenticate as unprivileged user and try again::
 
     >>> layer.authenticate('max')
     >>> has_permission('edit', revision, request)
@@ -283,3 +283,29 @@ Only 'manager' is allowed to perform a transition from 'frozen'::
     >>> workflow.transition(revision, request, 'frozen_2_working_copy')
     >>> revision.state
     u'working_copy'
+
+Test if transition callback changes active state as expected. Only one revision
+in media can be active at the same time::
+
+    >>> workflow.transition(revision, request, 'working_copy_2_active')
+    >>> revision.state
+    u'active'
+    
+    >>> revision.__name__
+    '0'
+    
+    >>> revision_1 = revision.__parent__['1']
+    >>> revision_1.__name__
+    '1'
+    
+    >>> revision_1.state
+    u'working_copy'
+    
+    >>> workflow.transition(revision_1, request, 'working_copy_2_active')
+    >>> revision_1.state
+    u'active'
+    
+    >>> revision.state
+    u'working_copy'
+
+    >>> layer.logout()
