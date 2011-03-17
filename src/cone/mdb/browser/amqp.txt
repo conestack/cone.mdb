@@ -55,5 +55,5 @@ Manager is allowed to edit settings::
     >>> res = render_tile(amqp, request, 'editform')
     >>> request.environ['cone.app.continuation']
     [<cone.app.browser.ajax.AjaxAction object at ...>]
-
     
+    >>> layer.logout()

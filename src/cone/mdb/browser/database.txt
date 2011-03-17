@@ -1,0 +1,52 @@
+Database Settings form
+======================
+
+Check ACL::
+
+    >>> import cone.mdb.browser.database
+    >>> from cone.tile import render_tile
+    >>> from pyramid.testing import DummyRequest
+    >>> from cone.app import root
+    >>> database = root['settings']['database']
+
+Anonymous unauthorized::
+
+    >>> request = DummyRequest()
+    >>> res = render_tile(database, request, 'editform')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.mdb.browser.database.DatabaseSettingsForm object at ...> 
+    failed permission check
+
+Unprivileged unauthorized::
+
+    >>> layer.authenticate('max')
+    >>> res = render_tile(database, request, 'editform')
+    Traceback (most recent call last):
+      ...
+    Forbidden: Unauthorized: tile 
+    <cone.mdb.browser.database.DatabaseSettingsForm object at ...> 
+    failed permission check
+
+Manager is allowed to edit settings::
+
+    >>> layer.authenticate('manager')
+    
+    >>> res = render_tile(database, request, 'editform')
+    >>> res.find('action="http://example.com/settings/database/edit"') > 0
+    True
+    
+    >>> request.params['databaseform.path'] = database.attrs.path
+    >>> request.params['action.databaseform.save'] = '1'
+    
+    >>> res = render_tile(database, request, 'editform')
+    >>> request.environ['redirect']
+    <HTTPFound at ... 302 Found>
+    
+    >>> request.params['ajax'] = '1'
+    >>> res = render_tile(database, request, 'editform')
+    >>> request.environ['cone.app.continuation']
+    [<cone.app.browser.ajax.AjaxAction object at ...>]
+    
+    >>> layer.logout()

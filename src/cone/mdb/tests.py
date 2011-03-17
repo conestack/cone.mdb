@@ -23,6 +23,7 @@ TESTFILES = [
     'model/solr.txt',
     'model/utils.txt',
     'browser/amqp.txt',
+    'browser/database.txt',
 ]
 
 def test_suite():
