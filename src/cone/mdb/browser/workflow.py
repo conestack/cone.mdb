@@ -10,6 +10,10 @@ from cone.app.browser.utils import (
     make_url,
 )
 
+import logging
+logger = logging.getLogger('cone.mdb')
+
+
 @tile('wf_dropdown', 'templates/wf_dropdown.pt', 
       permission='view', strict=False)
 class WfDropdown(Tile):
@@ -54,9 +58,9 @@ class WfDropdown(Tile):
         try:
             transitions = workflow.get_transitions(
                 self.model, self.request, from_state=self.model.state)
-        except Exception, e:
-            print e
-            return ret
+        except WorkflowError, e:                            #pragma NO COVERAGE
+            logger.error("transitions error: %s" % str(e))  #pragma NO COVERAGE
+            return ret                                      #pragma NO COVERAGE
         # XXX: check in repoze.workflow the intended way for naming
         #      transitions
         transition_names = self.model.properties.wf_transition_names
