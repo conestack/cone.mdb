@@ -65,4 +65,16 @@ Add::
     >>> res.find('No file uploaded') > -1
     True
     
+    >>> request.params['revisionform.title'] = 'Revision title'
+    >>> request.params['revisionform.data'] = 'foobar'
+    >>> res = render_tile(media, request, 'add')
+    >>> res
+    u''
+    
+    >>> revision = media['3']
+    >>> request = DummyRequest()
+    >>> res = render_tile(revision, request, 'content')
+    >>> res.find('Revision title') > -1
+    True
+    
     >>> layer.logout()

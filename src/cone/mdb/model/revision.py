@@ -55,11 +55,6 @@ solr_date_keys = [
     'modified',
 ]
 
-sorl_non_metadata_keys = [
-    'path',
-    'revision',
-]
-
 # XXX: via i18n
 transition_names = {
     'working_copy_2_active': 'Set active',
@@ -84,7 +79,8 @@ def persist_state(revision, info):
                 workflow = info.workflow
                 workflow.transition(val, request, u'active_2_working_copy')
     revision()
-    index_metadata(solr_config(revision), revision.model)
+    path = '/'.join(nodepath(revision))
+    index_metadata(solr_config(revision), revision.model, path)
 
 
 def set_metadata(metadata, data):
@@ -134,7 +130,7 @@ def solr_date(dt):
         return date
 
 
-def index_metadata(config, revision):
+def index_metadata(config, revision, path):
     """Index revision metadata in solr.
     
     ``config``
@@ -144,13 +140,8 @@ def index_metadata(config, revision):
     """
     try:
         md = dict()
-        md['path'] = '/'.join(nodepath(revision))
-        md['revision'] = revision.__name__
         metadata = revision['metadata']
         for key in metadata.keys():
-            # value not available on metadata
-            if key in sorl_non_metadata_keys:
-                continue
             # non indexed metadata is ignored
             if not key in solr_whitelist:
                 # should not happen here because mdb metadata already protect
@@ -165,6 +156,8 @@ def index_metadata(config, revision):
                 md[key] = date
                 continue
             md[key] = val
+        md['revision'] = revision.__name__
+        md['path'] = path
         solr_md = SolrMetadata(config, solr_whitelist, **md)
         solr_md()
     except Exception, e:
@@ -210,7 +203,8 @@ def add_revision(request, media, data):
     workflow.initialize(revision_adapter)
     
     media()
-    index_metadata(solr_config(media), revision)
+    path = '/'.join(nodepath(media) + [revision.__name__])
+    index_metadata(solr_config(media), revision, path)
 
 
 def update_revision(request, revision, data):
@@ -229,7 +223,8 @@ def update_revision(request, revision, data):
     set_binary(revision.model, data)
     set_metadata(metadata, data)
     revision()
-    index_metadata(solr_config(revision), revision.model)
+    path = '/'.join(nodepath(revision))
+    index_metadata(solr_config(revision), revision.model, path)
 
 
 class RevisionAdapter(AdapterNode):

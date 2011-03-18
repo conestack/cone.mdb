@@ -1,7 +1,7 @@
 <tal:ajax xmlns:ajax="http://namesspaces.bluedynamics.eu/ajax" omit-tag="True">
   <div class="transitions_dropdown"
-       tal:define="state context.model.state;
-	               transitions context.transitions">
+       tal:define="transitions context.transitions;
+	               state context.model.state">
     <div class="state">
       <span>State:</span>
       <a href="${context.nodeurl}/changestate"

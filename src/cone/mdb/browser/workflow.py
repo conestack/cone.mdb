@@ -40,6 +40,7 @@ class WfDropdown(Tile):
             return
         workflow = self.workflow
         workflow.transition(self.model, self.request, transition)
+        self.model()
         
     @property
     def workflow(self):
@@ -53,7 +54,7 @@ class WfDropdown(Tile):
         try:
             transitions = workflow.get_transitions(
                 self.model, self.request, from_state=self.model.state)
-        except Ecxeption, e:
+        except Exception, e:
             print e
             return ret
         # XXX: check in repoze.workflow the intended way for naming

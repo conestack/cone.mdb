@@ -44,7 +44,8 @@ Revision
     >>> revision.__name__ = '0'
     >>> revision['metadata'] = metadata
     >>> config = solr_config(root)
-    >>> index_metadata(config, revision)
+    >>> path = 'foo/bar/baz'
+    >>> index_metadata(config, revision, path)
     
     >>> from cone.mdb.solr import Metadata as SolrMetadata
     >>> from cone.mdb.model.revision import solr_whitelist
@@ -54,7 +55,7 @@ Revision
     ['path', 'author', 'created', 'uid', 'revision']
     
     >>> solr_md.path
-    '0'
+    'foo/bar/baz'
     
     >>> solr_md.author
     'max'
@@ -72,7 +73,8 @@ Revision
     >>> revision.__name__ = '1'
     >>> revision['metadata'] = Metadata()
     >>> config = solr_config(root)
-    >>> index_metadata(config, revision)
+    >>> path = 'foo/bar/baz'
+    >>> index_metadata(config, revision, path)
     Traceback (most recent call last):
       ...
     SolrError: [Reason: Document [null] missing required field: uid]

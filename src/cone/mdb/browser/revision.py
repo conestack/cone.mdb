@@ -270,7 +270,6 @@ class RevisionForm(object):
             data['alttag'],
             ', '.join(data['keywords']),
         ])
-        print data
         return data
 
 
