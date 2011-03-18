@@ -105,7 +105,7 @@ class RevisionForm(object):
                 'rows': 5,
             })
         form['keywords'] = factory(
-            'field:label:textarea:*keywords',
+            'field:label:*keywords:textarea',
             value = self.keywords_value,
             props = {
                 'label': 'Keywords',
@@ -115,7 +115,7 @@ class RevisionForm(object):
                 'keywords': ([self.keywords_extractor], [], [], []),
             })
         form['relations'] = factory(
-            'field:label:reference:*relations',
+            'field:label:*relations:reference',
             value = self.relations_value,
             props = {
                 'label': 'Relations',
@@ -201,6 +201,7 @@ class RevisionForm(object):
             if rel and rel[0].get('title'):
                 title = rel[0].title
             else:
+                # happens if relation is not found in solr
                 title = relation
             vocab.append((relation, title))
         return vocab
@@ -236,18 +237,13 @@ class RevisionForm(object):
             relations = list()
         if isinstance(relations, basestring):
             relations = [relations]
-        return relations
+        return [rel for rel in relations if rel]
     
     def _field_id(self, s):
         return u'%s.%s' % (self.form_name, s)
     
-    def _save_val(self, val):
-        if val is UNSET:
-            return u''
-        return val
-    
     def _fetch(self, data, name):
-        return self._save_val(data.fetch(self._field_id(name)).extracted)
+        return data.fetch(self._field_id(name)).extracted
 
     def revision_data(self, data):
         f = self._fetch

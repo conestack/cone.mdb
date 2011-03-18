@@ -77,4 +77,117 @@ Add::
     >>> res.find('Revision title') > -1
     True
     
+    >>> revision.metadata.visibility
+    'hidden'
+    
+    >>> revision.metadata.title
+    'Revision title'
+    
+    >>> revision.metadata.author
+    ''
+    
+    >>> revision.metadata.description
+    ''
+    
+    >>> revision.metadata.keywords
+    []
+    
+    >>> revision.metadata.relations
+    []
+    
+    >>> revision.metadata.effective
+    ''
+    
+    >>> revision.metadata.expires
+    ''
+    
+    >>> revision.metadata.alttag
+    ''
+
+Edit::
+
+    >>> from datetime import datetime
+    >>> request = DummyRequest()
+    >>> request.params['revisionform.visibility'] = 'anonymous'
+    >>> request.params['revisionform.title'] = 'Other revision title'
+    >>> request.params['revisionform.author'] = 'sepp'
+    >>> request.params['revisionform.description'] = 'Revision description'
+    >>> request.params['revisionform.keywords'] = 'a\nb\nc'
+    >>> request.params['revisionform.relations'] = media['2'].metadata.uid
+    >>> request.params['revisionform.effective'] = '1.3.2011'
+    >>> request.params['revisionform.expires'] = '10.3.2011'
+    >>> request.params['revisionform.alttag'] = 'alttag'
+    >>> request.params['revisionform.data'] = 'foobar'
+    >>> request.params['action.revisionform.save'] = '1'
+    >>> res = render_tile(revision, request, 'edit')
+    >>> res
+    u''
+    
+    >>> request.environ['redirect']
+    <HTTPFound at ... 302 Found>
+    
+    >>> revision.metadata.visibility
+    'anonymous'
+    
+    >>> revision.metadata.title
+    'Other revision title'
+    
+    >>> revision.metadata.author
+    'sepp'
+    
+    >>> revision.metadata.description
+    'Revision description'
+    
+    >>> revision.metadata.keywords
+    ['a', 'b', 'c']
+    
+    >>> revision.metadata.relations
+    ['...']
+    
+    >>> revision.metadata.effective
+    datetime.datetime(2011, 3, 1, 0, 0)
+    
+    >>> revision.metadata.expires
+    datetime.datetime(2011, 3, 10, 0, 0)
+    
+    >>> revision.metadata.alttag
+    'alttag'
+
+Revision details now displays relations::
+
+    >>> request = DummyRequest()
+    >>> res = render_tile(revision, request, 'content')
+    >>> res.find('ajax:target="http://example.com/repositories/repo1/a/2"') > -1
+    True
+
+Set revision active, when edit, visibility is always anonymous::
+
+    >>> from repoze.workflow import get_workflow
+    >>> workflow = get_workflow(revision.__class__, revision.properties.wf_name)
+    >>> workflow.transition(revision, request, 'working_copy_2_active')
+    >>> revision.state
+    u'active'
+    
+    >>> res = render_tile(revision, request, 'edit')
+    >>> res.find('value="hidden"') > -1
+    False
+
+Existing relations are displayed in edit form::
+
+    >>> res.find('<option id="input-revisionform-relations') > -1
+    True
+
+If relations is not found in solr, the id is displayed in edit form as is::
+
+    >>> revision.metadata.relations = ['foooooooo']
+    >>> res = render_tile(revision, request, 'edit')
+    >>> res.find('value="foooooooo">foooooooo</option>') > -1
+    True
+
+Download view::
+
+    >>> from cone.mdb.browser.revision import download
+    >>> str(download(revision, request))
+    '200 OK\nContent-Length: 6\nContent-Disposition: attachment\n\nfoobar'
+
     >>> layer.logout()
