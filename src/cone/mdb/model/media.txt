@@ -30,6 +30,11 @@ Media
     >>> media
     <MediaAdapter object 'c' at ...>
     
+    >>> media['inexistent']
+    Traceback (most recent call last):
+      ...
+    KeyError: 'inexistent'
+    
     >>> properties = media.properties
     >>> properties.keys()
     ['action_view', 'editable', 'in_navtree', 'action_list', 'action_up']
