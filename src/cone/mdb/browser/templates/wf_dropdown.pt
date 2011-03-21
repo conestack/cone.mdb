@@ -18,7 +18,7 @@
         <a href="${transition.url}"
            ajax:bind="click"
            ajax:target="${transition.target}"
-           ajax:action="wf_dropdown:.transitions_dropdown:replace"
+           ajax:action="wf_dropdown:NONE:NONE"
            tal:content="transition.title">
           transition
         </a>

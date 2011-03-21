@@ -5,6 +5,10 @@ from cone.tile import (
     Tile,
 )
 from cone.app.model import Properties
+from cone.app.browser.ajax import (
+    AjaxAction,
+    AjaxEvent,
+)
 from cone.app.browser.utils import (
     make_query,
     make_url,
@@ -45,6 +49,12 @@ class WfDropdown(Tile):
         workflow = self.workflow
         workflow.transition(self.model, self.request, transition)
         self.model()
+        url = make_url(self.request, node=self.model)
+        continuation = [
+            AjaxAction(url, 'content', 'inner', '#content'),
+            AjaxEvent(url, 'contextchanged', '.contextsensitiv'),
+        ]
+        self.request.environ['cone.app.continuation'] = continuation
         
     @property
     def workflow(self):
