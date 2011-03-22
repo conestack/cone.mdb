@@ -52,7 +52,7 @@ Revision
     >>> solr_md = SolrMetadata(config, solr_whitelist, uid='1')
     >>> solr_md.query()
     >>> solr_md.keys()
-    ['path', 'author', 'created', 'uid', 'revision']
+    ['uid', 'author', 'physical_path', 'created', 'path', 'revision']
     
     >>> solr_md.path
     'foo/bar/baz'

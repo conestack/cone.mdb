@@ -1,4 +1,3 @@
-from bda.basen import base62
 from webob import Response
 from cone.app import get_root
 from cone.mdb.solr import Metadata
@@ -6,23 +5,29 @@ from cone.mdb.model.utils import solr_config
 from cone.mdb.model.revision import solr_whitelist
 
 
+class MDBError(Exception): pass
+
+
 def download(request):
     uid = request.matchdict['uid']
     rev = request.matchdict.get('rev')
-    import pdb;pdb.set_trace()
-    
     root = get_root(None)
     config = solr_config(root)
-    
     query = 'url:%s' % uid
     if rev:
         query += ' AND revision:%s' % rev
     else:
         query += ' AND flag:active'
     md = Metadata(config, solr_whitelist)
-    res = md.query(q=query)
-    
-    return Response('download')
+    result = md.query(q=query)
+    if len(result) != 1:
+        raise MDBError(u'Dataset not found in SOLR')
+    physical_path = u'/xsendfile%s.binary' % result[0]['physical_path']
+    response = Response()
+    response.content_type = result[0]['metatype']
+    response.content_disposition = 'attachment'
+    response.headers.add('X-Accel-Redirect', physical_path)
+    return response
 
 
 def search(request):

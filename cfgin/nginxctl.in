@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Specify path variable
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+
+# Kill me on all errors
+set -e
+
+# define binaries
+NGINX=${nginx:location}/sbin/nginx
+
+case "$1" in
+  start)
+    $NGINX
+    ;;
+  stop)
+    kill `cat ${nginx:location}/logs/nginx.pid`
+    ;;    
+  *)
+    echo "Usage: $0 {start|stop}"
+    exit 1
+    ;;
+esac

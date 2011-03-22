@@ -20,9 +20,9 @@ Solr settings node
     >>> solr()
     
     >>> solr.attrs.server = 'inexistent'
-    >>> solr.solrstatus
+    >>> solr.status
     'Failed'
     
     >>> solr.attrs.server = 'localhost'
-    >>> solr.solrstatus
+    >>> solr.status
     'OK'

@@ -1,3 +1,4 @@
+import os
 import uuid
 import datetime
 from bda.basen import base62
@@ -45,8 +46,10 @@ solr_whitelist = [
     'flag', # XXX: rename to state somewhen
     'visibility',
     'path',
+    'physical_path',
     'modified',
     'filename',
+    'size',
 ]
 
 solr_date_keys = [
@@ -149,7 +152,9 @@ def index_metadata(config, revision, path):
             if not key in solr_whitelist:
                 # should not happen here because mdb metadata already protect
                 # XXX: clean up
-                continue                                    #pragma NO COVERAGE
+                continue
+            if not hasattr(metadata, key):
+                continue
             val = getattr(metadata, key)
             # convert value to solr accepted date format if dt instance
             if key in solr_date_keys:
@@ -161,6 +166,11 @@ def index_metadata(config, revision, path):
             md[key] = val
         md['revision'] = revision.__name__
         md['path'] = path
+        md['physical_path'] = '/'.join(nodepath(revision))
+        try:
+            md['size'] = os.path.getsize(md['physical_path'])
+        except OSError, e:
+            pass
         solr_md = SolrMetadata(config, solr_whitelist, **md)
         solr_md()
     except Exception, e:
