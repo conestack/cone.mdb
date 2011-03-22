@@ -11,7 +11,7 @@ def download(request):
     rev = request.matchdict.get('rev')
     import pdb;pdb.set_trace()
     
-    root = get_root()
+    root = get_root(None)
     config = solr_config(root)
     
     query = 'url:%s' % uid
@@ -27,7 +27,7 @@ def download(request):
 
 def search(request):
     term = request.matchdict['term']
-    root = get_root()
+    root = get_root(None)
     config = solr_config(root)
     query = ''
     for search_key in ['title', 'description', 'creator', 'author', 'body']:
@@ -42,10 +42,10 @@ def search(request):
 
 
 def access(request):
-    root = get_root()
+    root = get_root(None)
     return Response('access')
 
 
 def info(request):
-    root = get_root()
+    root = get_root(None)
     return Response('info')

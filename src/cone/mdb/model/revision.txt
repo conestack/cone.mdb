@@ -244,6 +244,12 @@ Authenticate as unprivileged user and try again::
     >>> revision.state
     u'active'
     
+Solr must be updated as well::
+    
+    >>> solr_md = SolrMetadata(config, solr_whitelist)
+    >>> len(solr_md.query(q=u'flag:active')) == 1
+    True
+    
     >>> transitions = workflow.get_transitions(
     ...     revision, request, from_state=revision.state)
     >>> [tr['name'] for tr in transitions]

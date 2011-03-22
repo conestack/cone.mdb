@@ -22,7 +22,7 @@ class Solr(BaseNode):
         return self._config
     
     @property
-    def solrstatus(self):
+    def status(self):
         try:
             conf = self.attrs
             url = 'http://%s:%s/%s/' % (conf.server, conf.port, conf.basepath)

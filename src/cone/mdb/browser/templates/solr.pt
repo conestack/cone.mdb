@@ -1,7 +1,25 @@
+<tal:ajax xmlns:ajax="http://namesspaces.bluedynamics.eu/ajax" omit-tag="True">
 <div>
   
   <h1>Solr Settings</h1>
   
   <tal:settings replace="structure tile('editform')" />
+  
+  <br />
+  <strong>Solr Status:</strong>
+  <strong tal:define="status context.model.status"
+          tal:content="status"
+          tal:attributes="style status == 'OK' and 'color:green' or 'color:red'">
+    OK
+  </strong>
+  
+  <br />
+  <br />
+  <strong>Maintenance</strong>
+  <a href=""
+     ajax:bind="click"
+	 ajax:target="${context.nodeurl}"
+	 ajax:action="rebuild:NONE:NONE">Rebuild Index</a>
 
 </div>
+</tal:ajax>

@@ -1,13 +1,19 @@
 from plumber import plumber
+from pysolr import Solr as PySolr
 from yafowil.base import factory
 from cone.tile import (
+    Tile,
     tile,
     registerTile,
 )
+from cone.mdb.model.utils import solr_config
+from cone.mdb.model.revision import index_metadata
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
 from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
+from cone.app.browser.utils import nodepath
+from cone.app.browser.ajax import AjaxAction
 from cone.mdb.model import Solr
 
 
@@ -16,6 +22,25 @@ registerTile('content',
              interface=Solr,
              class_=ProtectedContentTile,
              permission='login')
+
+
+@tile('rebuild', interface=Solr, permission="manage")
+class Rebuild(Tile):
+    
+    def render(self):
+        conf = self.model.attrs
+        url = 'http://%s:%s/%s/' % (conf.server, conf.port, conf.basepath)
+        PySolr(url).delete(q='*:*')
+        repositories = self.model.root['repositories']
+        for repository in repositories.values():
+            for media in repository.values():
+                for revision in media.values():
+                    path = '/'.join(nodepath(revision))
+                    index_metadata(solr_config(revision), revision.model, path)
+        url = make_url(self.request, node=self.model)
+        continuation = [AjaxAction(url, 'content', 'inner', '.solr')]
+        self.request.environ['cone.app.continuation'] = continuation
+        return u''
 
 
 @tile('editform', interface=Solr, permission="manage")

@@ -79,6 +79,8 @@ def persist_state(revision, info):
                 request = get_current_request()
                 workflow = info.workflow
                 workflow.transition(val, request, u'active_2_working_copy')
+    
+    revision.metadata.flag = info.transition[u'to_state']
     revision()
     path = '/'.join(nodepath(revision))
     index_metadata(solr_config(revision), revision.model, path)
