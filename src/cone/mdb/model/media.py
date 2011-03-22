@@ -1,4 +1,5 @@
 import os
+import uuid
 from pyramid.security import authenticated_userid
 from node.ext.mdb import (
     Media,
@@ -34,6 +35,7 @@ def add_media(request, repository, title, description):
     model = Media()
     repository[key] = model
     media = MediaAdapter(model, None, None)
+    media.metadata.uid = str(uuid.uuid4())
     media.metadata.title = title
     media.metadata.description = description
     media.metadata.creator = authenticated_userid(request)

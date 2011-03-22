@@ -12,6 +12,7 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
 layer = testing.Database()
 
 TESTFILES = [
+    'public.txt',
 #    'amqp.txt',
     'solr.txt', # XXX: this test resets solr index!!!
 #    'model/amqp.txt',

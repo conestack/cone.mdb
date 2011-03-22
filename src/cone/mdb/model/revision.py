@@ -1,5 +1,6 @@
 import uuid
 import datetime
+from bda.basen import base62
 from pyramid.security import authenticated_userid
 from pyramid.threadlocal import get_current_request
 from repoze.workflow import get_workflow
@@ -188,11 +189,9 @@ def add_revision(request, media, data):
     revision['metadata'] = metadata
     metadata.revision = key
     metadata.uid = str(uuid.uuid4())
+    metadata.url = str(base62(int(uuid.UUID(media.metadata.uid))))
     metadata.created = timestamp()
     metadata.creator = authenticated_userid(request)
-    
-    # XXX: Calculate tiny url for frontend
-    metadata.url = ''
     
     set_binary(revision, data)
     set_metadata(metadata, data)

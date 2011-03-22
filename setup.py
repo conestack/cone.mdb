@@ -45,5 +45,7 @@ setup(name='cone.mdb',
       ],
       test_suite = "cone.ugm.tests.test_suite",
       entry_points = """\
+      [paste.app_factory]
+      pub_main = cone.mdb:pub_main
       """
       )

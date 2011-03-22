@@ -59,7 +59,10 @@ Media
     <cone.app.model.XMLProperties object at ...>
     
     >>> metadata.keys()
-    ['title', 'description', 'creator', 'created']
+    ['uid', 'title', 'description', 'creator', 'created']
+    
+    >>> metadata.uid
+    u'...'
     
     >>> metadata.title
     u'Media 3'
@@ -80,7 +83,8 @@ Media
     >>> update_media(request, media, u'New title', u'New description')
     
     >>> metadata.keys()
-    ['title', 'description', 'creator', 'created', 'modified', 'modified_by']
+    ['uid', 'title', 'description', 'creator', 
+    'created', 'modified', 'modified_by']
     
     >>> metadata.title
     u'New title'
