@@ -1,3 +1,4 @@
+import datetime
 from webob import Response
 from plumber import plumber
 from zope.component import queryUtility
@@ -32,6 +33,13 @@ from cone.mdb.solr import Metadata as SolrMetadata
 @tile('revisiondetails', 'templates/revisiondetails.pt',
       interface=RevisionAdapter, permission='view')
 class RevisionDetails(Tile):
+    
+    def format_date(self, val):
+        if not val:
+            return u''
+        if isinstance(val, datetime.datetime):
+            return val.strftime('%d.%m.%Y - %H:%M')
+        return val
     
     @property
     def relations(self):

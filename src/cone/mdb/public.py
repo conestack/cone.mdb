@@ -1,3 +1,5 @@
+import time
+import datetime
 from webob import Response
 from cone.app import get_root
 from cone.mdb.solr import Metadata
@@ -63,6 +65,13 @@ class Term(object):
         term.query = self.query
 
 
+def solr2dt(val):
+    # val: '2011-03-03T00:00:00Z'
+    format = '%Y-%m-%dT%H:%M:%SZ'
+    args = time.strptime(val, format)[0:3] + (0, 0, 0)
+    return datetime.datetime(*args)
+
+
 def download(request):
     uid = request.matchdict['uid']
     rev = request.matchdict.get('rev')
@@ -78,7 +87,13 @@ def download(request):
     result = md.query(q=query)
     if len(result) != 1:
         raise MDBError(u'Dataset not found in SOLR. Query: %s' % query)
-    # XXX: effective, expires
+    now = datetime.datetime.now()
+    effective = result[0].get('effective')
+    if effective and solr2dt(effective) > now:
+        raise MDBError(u'Item not effective')
+    expires = result[0].get('expires')
+    if expires and solr2dt(expires) < now:
+        raise MDBError(u'Item expired')
     physical_path = u'/xsendfile%s.binary' % result[0]['physical_path']
     response = Response()
     response.content_type = result[0]['metatype']

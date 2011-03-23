@@ -55,6 +55,14 @@
         </td>
       </tr>
       <tr>
+        <td class="labelcol">Effective Date</td>
+        <td tal:content="context.format_date(metadata.effective)">2011-03-01</td>
+      </tr>
+      <tr>
+        <td class="labelcol">Expiration Date</td>
+        <td tal:content="context.format_date(metadata.expires)">2011-03-01</td>
+      </tr>
+      <tr>
         <td class="labelcol">File</td>
         <td>
           <a href="${context.nodeurl}/download"

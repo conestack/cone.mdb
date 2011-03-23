@@ -73,6 +73,7 @@ def persist_state(revision, info):
     """Transition callback for repoze.workflow
     """
     if info.transition[u'to_state'] == u'active':
+        revision.metadata.visibility = 'anonymous'
         media = revision.__parent__
         for val in media.values():
             if val is revision:
@@ -82,7 +83,6 @@ def persist_state(revision, info):
                 request = get_current_request()
                 workflow = info.workflow
                 workflow.transition(val, request, u'active_2_working_copy')
-    
     revision.metadata.flag = info.transition[u'to_state']
     revision()
     path = '/'.join(nodepath(revision))
