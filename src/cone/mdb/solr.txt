@@ -1,7 +1,21 @@
 Read/write interface for ``mdb`` to ``Lucene`` indexing server
 ==============================================================
 
-Test expected server behavior due to ``pysolr``::
+Create queries::
+
+    >>> from cone.mdb.solr import Term, Group
+    >>> Term('foo', 'foo') & Term('bar', 'bar') | Term('baz', 'baz')
+    foo:foo AND bar:bar OR baz:baz
+    
+    >>> Term('foo', 'foo') & Group(Term('bar', 'bar') | Term('baz', 'baz'))
+    foo:foo AND (bar:bar OR baz:baz)
+    
+    >>> Group(Term('foo', 'foo') & Term('bar', 'bar')) | Term('baz', 'baz')
+    (foo:foo AND bar:bar) OR baz:baz
+    
+    >>> Group(Term('foo', 'foo') & Term('bar', 'bar')) \
+    ... & Group(Term('bar', 'bar') | Term('baz', 'baz'))
+    (foo:foo AND bar:bar) AND (bar:bar OR baz:baz)
 
 Print helper::
 

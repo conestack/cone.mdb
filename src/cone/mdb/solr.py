@@ -9,6 +9,62 @@ class Config(object):
         self.port = '8983'
         self.path = 'solr'
 
+
+class QueryError(Exception): pass
+
+
+class Group(object):
+    
+    def __init__(self, term):
+        self.term = term
+    
+    def __and__(self, term):
+        self.term.query = '(%s)' % self.term.query
+        return self.term & term
+    
+    def __or__(self, term):
+        self.term.query = '(%s)' % self.term.query
+        return self.term | term
+
+
+class Term(object):
+    
+    def __init__(self, name, value):
+        self.query = ''
+        self.name = name
+        self.value = value
+    
+    def __str__(self):
+        return self.query
+    
+    __repr__ = __str__
+    
+    def __and__(self, term):
+        self.extend(term, 'AND')
+        return self
+    
+    def __or__(self, term):
+        self.extend(term, 'OR')
+        return self
+    
+    def extend(self, term, operator):
+        if isinstance(term, Group):
+            if self.query:
+                self.query = '%s %s (%s)' % (
+                    self.query, operator, term.term)
+            else:
+                self.query = '%s:%s %s (%s)' % (
+                    self.name, self.value, operator, term.term)
+            return
+        if self.query:
+            self.query = '%s %s %s:%s' % (
+                self.query, operator, term.name, term.value)
+        else:
+            self.query = '%s:%s %s %s:%s' % (
+                self.name, self.value, operator, term.name, term.value)
+        term.query = self.query
+
+
 class Metadata(dict):
     
     def __init__(self, config, attributes, **kwargs):

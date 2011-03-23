@@ -2,67 +2,16 @@ import time
 import datetime
 from webob import Response
 from cone.app import get_root
-from cone.mdb.solr import Metadata
+from cone.mdb.solr import (
+    Group,
+    Term,
+    Metadata,
+)
 from cone.mdb.model.utils import solr_config
 from cone.mdb.model.revision import solr_whitelist
 
 
 class MDBError(Exception): pass
-
-
-class QueryError(Exception): pass
-
-
-class Group(object):
-    
-    def __init__(self, term):
-        self.term = term
-    
-    def __and__(self, term):
-        self.term.query = '(%s)' % self.term.query
-        return self.term & term
-    
-    def __or__(self, term):
-        self.term.query = '(%s)' % self.term.query
-        return self.term | term
-
-
-class Term(object):
-    
-    def __init__(self, name, value):
-        self.query = ''
-        self.name = name
-        self.value = value
-    
-    def __str__(self):
-        return self.query
-    
-    __repr__ = __str__
-    
-    def __and__(self, term):
-        self.extend(term, 'AND')
-        return self
-    
-    def __or__(self, term):
-        self.extend(term, 'OR')
-        return self
-    
-    def extend(self, term, operator):
-        if isinstance(term, Group):
-            if self.query:
-                self.query = '%s %s (%s)' % (
-                    self.query, operator, term.term)
-            else:
-                self.query = '%s:%s %s (%s)' % (
-                    self.name, self.value, operator, term.term)
-            return
-        if self.query:
-            self.query = '%s %s %s:%s' % (
-                self.query, operator, term.name, term.value)
-        else:
-            self.query = '%s:%s %s %s:%s' % (
-                self.name, self.value, operator, term.name, term.value)
-        term.query = self.query
 
 
 def solr2dt(val):
