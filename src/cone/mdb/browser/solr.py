@@ -1,4 +1,3 @@
-import os
 from plumber import plumber
 from pysolr import Solr as PySolr
 from yafowil.base import factory
@@ -7,13 +6,11 @@ from cone.tile import (
     tile,
     registerTile,
 )
-from cone.mdb.solr import index_doc
-from cone.mdb.model.utils import solr_config
+from cone.mdb.model.revision import index_revision
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
 from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
-from cone.app.browser.utils import nodepath
 from cone.app.browser.ajax import AjaxAction
 from cone.mdb.model import Solr
 
@@ -36,18 +33,7 @@ class Rebuild(Tile):
         for repository in repositories.values():
             for media in repository.values():
                 for revision in media.values():
-                    path = '/'.join(nodepath(revision))
-                    physical_path = '/'.join(nodepath(revision.model))
-                    try:
-                        size = os.path.getsize(physical_path)
-                    except OSError, e:
-                        size = 0
-                    index_doc(solr_config(revision),
-                              revision,
-                              revision=revision.model.__name__,
-                              path=path,
-                              physical_path=physical_path,
-                              size=size)
+                    index_revision(revision)
         url = make_url(self.request, node=self.model)
         continuation = [AjaxAction(url, 'content', 'inner', '.solr')]
         self.request.environ['cone.app.continuation'] = continuation

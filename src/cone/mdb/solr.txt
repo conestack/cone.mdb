@@ -17,6 +17,16 @@ Create queries::
     ... & Group(Term('bar', 'bar') | Term('baz', 'baz'))
     (foo:foo AND bar:bar) AND (bar:bar OR baz:baz)
 
+``sorl_date``::
+
+    >>> from datetime import datetime
+    >>> from cone.mdb.solr import solr_date
+    >>> dt = datetime(2011, 3, 16)
+    >>> solr_date(dt)
+    '2011-03-16T00:00:00Z'
+    
+    >>> solr_date(None)
+
 Print helper::
 
     >>> def printres(res):

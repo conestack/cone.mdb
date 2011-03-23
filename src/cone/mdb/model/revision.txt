@@ -25,50 +25,29 @@ Revision
     >>> metadata.uid
     '1'
 
-``sorl_date``::
+``index_revision``::
 
-XXX: move to cone.mdb.solr
-
-    >>> from cone.mdb.solr import solr_date
-    >>> dt = datetime(2011, 3, 16)
-    >>> solr_date(dt)
-    '2011-03-16T00:00:00Z'
-    
-    >>> solr_date(None)
-
-``index_doc``::
-
-XXX: move to cone.mdb.solr
-
-    >>> from cone.app.browser.utils import nodepath
-    >>> from cone.mdb.solr import index_doc
-    >>> from cone.mdb.model import solr_config
-    >>> from cone.mdb.model.revision import RevisionAdapter
     >>> from cone.app import root
+    >>> from cone.mdb.model import solr_config
+    >>> from cone.mdb.model.revision import index_revision
+    >>> from cone.mdb.model.revision import RevisionAdapter
     >>> from node.ext.mdb import Revision
+    
     >>> revision = Revision()
     >>> revision.__name__ = '0'
     >>> revision['metadata'] = metadata
-    >>> config = solr_config(root)
-    >>> path = 'foo/bar/baz'
-    >>> physical_path = '/'.join(nodepath(revision))
-    >>> size = 0
-    >>> index_doc(config,
-    ...           RevisionAdapter(revision, None, None),
-    ...           revision=revision.__name__,
-    ...           path=path,
-    ...           physical_path=physical_path,
-    ...           size=size)
+    >>> index_revision(RevisionAdapter(revision, 'foo', root))
     
     >>> from cone.mdb.solr import Metadata as SolrMetadata
     >>> from cone.mdb.solr import SOLR_FIELDS
+    >>> config = solr_config(root)
     >>> solr_md = SolrMetadata(config, SOLR_FIELDS, uid='1')
     >>> solr_md.query()
     >>> solr_md.keys()
     ['uid', 'author', 'physical_path', 'created', 'path', 'size', 'revision']
     
     >>> solr_md.path
-    'foo/bar/baz'
+    'foo'
     
     >>> solr_md.author
     'max'
@@ -85,16 +64,7 @@ XXX: move to cone.mdb.solr
     >>> revision = Revision()
     >>> revision.__name__ = '1'
     >>> revision['metadata'] = Metadata()
-    >>> config = solr_config(root)
-    >>> path = 'foo/bar/baz'
-    >>> physical_path = '/'.join(nodepath(revision))
-    >>> size = 0
-    >>> index_doc(config,
-    ...           RevisionAdapter(revision, None, None),
-    ...           revision=revision.__name__,
-    ...           path=path,
-    ...           physical_path=physical_path,
-    ...           size=size)
+    >>> index_revision(RevisionAdapter(revision, 'bar', root))
     Traceback (most recent call last):
       ...
     SolrError: [Reason: Document [null] missing required field: uid]

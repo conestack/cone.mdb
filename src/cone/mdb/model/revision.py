@@ -55,19 +55,7 @@ def persist_state(revision, info):
                 workflow.transition(val, request, u'active_2_working_copy')
     revision.metadata.flag = info.transition[u'to_state']
     revision()
-    
-    path = '/'.join(nodepath(revision))
-    physical_path = '/'.join(nodepath(revision.model))
-    try:
-        size = os.path.getsize(physical_path)
-    except OSError, e:
-        size = 0
-    index_doc(solr_config(revision),
-              revision,
-              revision=revision.model.__name__,
-              path=path,
-              physical_path=physical_path,
-              size=size)
+    index_revision(revision)
 
 
 def set_metadata(metadata, data):
@@ -106,6 +94,21 @@ def set_binary(revision, data):
     revision['binary'] = MDBBinary(payload=payload)
 
 
+def index_revision(revision):
+    path = '/'.join(nodepath(revision))
+    physical_path = '/'.join(nodepath(revision.model))
+    try:
+        size = os.path.getsize(physical_path)
+    except OSError, e:
+        size = 0
+    index_doc(solr_config(revision),
+              revision,
+              revision=revision.model.__name__,
+              path=path,
+              physical_path=physical_path,
+              size=size)
+
+
 def add_revision(request, media, data):
     """Add revision to media.
     
@@ -142,18 +145,7 @@ def add_revision(request, media, data):
     workflow.initialize(revision_adapter)
     
     media()
-    
-    physical_path = '/'.join(nodepath(revision))
-    try:
-        size = os.path.getsize(physical_path)
-    except OSError, e:
-        size = 0
-    index_doc(solr_config(media),
-              revision_adapter,
-              revision=revision.__name__,
-              path='/'.join(nodepath(media) + [revision.__name__]),
-              physical_path=physical_path,
-              size=size)
+    index_revision(revision_adapter)
 
 
 def update_revision(request, revision, data):
@@ -173,18 +165,7 @@ def update_revision(request, revision, data):
     set_metadata(metadata, data)
     
     revision()
-    
-    physical_path = '/'.join(nodepath(revision.model))
-    try:
-        size = os.path.getsize(physical_path)
-    except OSError, e:
-        size = 0
-    index_doc(solr_config(revision),
-              revision,
-              revision=revision.model.__name__,
-              path='/'.join(nodepath(revision)),
-              physical_path=physical_path,
-              size=size)
+    index_revision(revision)
 
 
 class RevisionAdapter(AdapterNode):
