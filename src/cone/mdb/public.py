@@ -97,7 +97,8 @@ def download(request):
     physical_path = u'/xsendfile%s.binary' % result[0]['physical_path']
     response = Response()
     response.content_type = result[0]['metatype']
-    response.content_disposition = 'attachment'
+    response.content_disposition = \
+        'attachment; filename=%s' % result[0]['filename']
     response.headers.add('X-Accel-Redirect', physical_path)
     return response
 
