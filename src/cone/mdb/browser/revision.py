@@ -26,8 +26,11 @@ from cone.mdb.model import (
     update_revision,
     solr_config,
 )
-from cone.mdb.model.revision import solr_whitelist
-from cone.mdb.solr import Metadata as SolrMetadata
+from cone.mdb.solr import (
+    Term,
+    SOLR_FIELDS,
+    Metadata as SolrMetadata,
+)
 
 
 @tile('revisiondetails', 'templates/revisiondetails.pt',
@@ -49,11 +52,10 @@ class RevisionDetails(Tile):
         ret = list()
         if not relations:
             return ret
-        query = ''
-        for rel in relations:
-            query = '%suid:%s OR ' % (query, rel)
-        query = query.strip(' OR ')
-        md = SolrMetadata(solr_config(self.model), solr_whitelist)
+        query = Term('uid', relations[0])
+        for rel in relations[1:]:
+            query = query | Term('uid', rel)
+        md = SolrMetadata(solr_config(self.model), SOLR_FIELDS)
         for relmd in md.query(q=query):
             ret.append({
                 'target': '%s/%s' % (self.request.application_url, relmd.path),
@@ -203,7 +205,7 @@ class RevisionForm(object):
         relations = self.model.metadata.relations
         if not relations:
             return vocab
-        md = SolrMetadata(solr_config(self.model), solr_whitelist)
+        md = SolrMetadata(solr_config(self.model), SOLR_FIELDS)
         for relation in relations:
             rel = md.query(q='uid:%s' % relation)
             if rel and rel[0].get('title'):

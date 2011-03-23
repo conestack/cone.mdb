@@ -2,7 +2,10 @@ from pyramid.security import authenticated_userid
 from cone.app.browser import ajax
 from cone.mdb.solr import Metadata
 from cone.mdb.model import solr_config
-from cone.mdb.model.revision import solr_whitelist
+from cone.mdb.solr import (
+    Term,
+    SOLR_FIELDS,
+)
 
 def solr_livesearch_callback(model, request):
     result = list()
@@ -10,11 +13,13 @@ def solr_livesearch_callback(model, request):
         return result
     config = solr_config(model)
     term = request.params['term']
-    query = ''
-    for search_key in ['title', 'description', 'creator', 'author', 'body']:
-        query = '%s%s:%s*~ OR ' % (query, search_key, term)
-    query = query.strip(' OR ')
-    for md in Metadata(config, solr_whitelist).query(q=query, fl='title,path'):
+    s_term = '%s*~' % term
+    query = Term('title', s_term) \
+          | Term('description', s_term) \
+          | Term('creator', s_term) \
+          | Term('author', s_term) \
+          | Term('body', s_term)
+    for md in Metadata(config, SOLR_FIELDS).query(q=query, fl='title,path'):
         result.append({
             'label': md.title,
             'value': term,

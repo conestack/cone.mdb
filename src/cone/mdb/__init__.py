@@ -25,21 +25,21 @@ def pub_main(global_config, **settings):
         'search',
         '/search/{term}',
         view=public.search,
-        accept='application/json',
+        #accept='application/json',
         renderer='json')
     
     config.add_route(
         'access',
         '/access/{uid}',
         view=public.access,
-        accept='application/json',
+        #accept='application/json',
         renderer='json')
     
     config.add_route(
         'info',
         '/info/{uid}',
         view=public.info,
-        accept='application/json',
+        #accept='application/json',
         renderer='json')
     
     config.add_route(

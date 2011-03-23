@@ -6,9 +6,9 @@ from cone.mdb.solr import (
     Group,
     Term,
     Metadata,
+    SOLR_FIELDS,
 )
 from cone.mdb.model.utils import solr_config
-from cone.mdb.model.revision import solr_whitelist
 
 
 class MDBError(Exception): pass
@@ -32,7 +32,7 @@ def download(request):
     else:
         query = query & Term('flag', 'active')
     query = query & Term('visibility', 'anonymous')
-    md = Metadata(config, solr_whitelist)
+    md = Metadata(config, SOLR_FIELDS)
     result = md.query(q=query)
     if len(result) != 1:
         raise MDBError(u'Dataset not found in SOLR. Query: %s' % query)
@@ -67,15 +67,17 @@ def search(request):
         size: int
         alttag: String 
     """
-    term = request.matchdict['term']
     root = get_root(None)
     config = solr_config(root)
-    query = ''
-    for search_key in ['title', 'description', 'creator', 'author', 'body']:
-        query = '%s%s:%s*~ OR ' % (query, search_key, term)
-    query = query.strip(' OR ')
+    term = '%s*~' % request.matchdict['term']
+    query = Term('title', term) \
+          | Term('description', term) \
+          | Term('creator', term) \
+          | Term('author', term) \
+          | Term('body', term)
     result = list()
-    for md in Metadata(config, solr_whitelist).query(q=query, fl='title,path'):
+    fl = 'title,description,uid,path'
+    for md in Metadata(config, SOLR_FIELDS).query(q=query, fl=fl):
         result.append({
             'label': md.title,
         })

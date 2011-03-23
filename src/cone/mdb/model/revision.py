@@ -1,6 +1,5 @@
 import os
 import uuid
-import datetime
 from bda.basen import base62
 from pyramid.security import authenticated_userid
 from pyramid.threadlocal import get_current_request
@@ -21,43 +20,14 @@ from cone.mdb.model.utils import (
     solr_config,
     timestamp,
 )
-from cone.mdb.solr import Metadata as SolrMetadata
+from cone.mdb.solr import (
+    index_doc,
+    SOLR_FIELDS,
+)
 
 import logging
 logger = logging.getLogger('mdb')
 
-# valid metadata keys
-solr_whitelist = [
-    'uid',
-    'author',
-    'created',
-    'effective',
-    'expires',
-    'revision',
-    'metatype',
-    'creator',
-    'keywords',
-    'url',
-    'relations',
-    'title',
-    'description',
-    'alttag',
-    'body',
-    'flag', # XXX: rename to state somewhen
-    'visibility',
-    'path',
-    'physical_path',
-    'modified',
-    'filename',
-    'size',
-]
-
-solr_date_keys = [
-    'created',
-    'effective',
-    'expires',
-    'modified',
-]
 
 # XXX: via i18n
 transition_names = {
@@ -85,8 +55,19 @@ def persist_state(revision, info):
                 workflow.transition(val, request, u'active_2_working_copy')
     revision.metadata.flag = info.transition[u'to_state']
     revision()
+    
     path = '/'.join(nodepath(revision))
-    index_metadata(solr_config(revision), revision.model, path)
+    physical_path = '/'.join(nodepath(revision.model))
+    try:
+        size = os.path.getsize(physical_path)
+    except OSError, e:
+        size = 0
+    index_doc(solr_config(revision),
+              revision,
+              revision=revision.model.__name__,
+              path=path,
+              physical_path=physical_path,
+              size=size)
 
 
 def set_metadata(metadata, data):
@@ -98,7 +79,7 @@ def set_metadata(metadata, data):
         dict containing metadata
     """
     for key, val in data.items():
-        if not key in solr_whitelist:
+        if not key in SOLR_FIELDS:
             continue
         setattr(metadata, key, val)
 
@@ -123,59 +104,6 @@ def set_binary(revision, data):
             metadata.metatype = file['mimetype']
             metadata.filename = file['filename']
     revision['binary'] = MDBBinary(payload=payload)
-    
-
-def solr_date(dt):
-    """Return date string acceppted by solr.
-    
-    ``dt``
-        datetime.datetime
-    """
-    if isinstance(dt, datetime.datetime):
-        date = '%sZ' % dt.isoformat()
-        return date
-
-
-def index_metadata(config, revision, path):
-    """Index revision metadata in solr.
-    
-    ``config``
-        cone.mdb.solr.Config
-    ``revision``
-        node.ext.mdb.Revision
-    """
-    try:
-        md = dict()
-        metadata = revision['metadata']
-        for key in metadata.keys():
-            # non indexed metadata is ignored
-            if not key in solr_whitelist:
-                # should not happen here because mdb metadata already protect
-                # XXX: clean up
-                continue
-            if not hasattr(metadata, key):
-                continue
-            val = getattr(metadata, key)
-            # convert value to solr accepted date format if dt instance
-            if key in solr_date_keys:
-                date = solr_date(val)
-                if not date:
-                    continue
-                md[key] = date
-                continue
-            md[key] = val
-        md['revision'] = revision.__name__
-        md['path'] = path
-        md['physical_path'] = '/'.join(nodepath(revision))
-        try:
-            md['size'] = os.path.getsize(md['physical_path'])
-        except OSError, e:
-            pass
-        solr_md = SolrMetadata(config, solr_whitelist, **md)
-        solr_md()
-    except Exception, e:
-        logger.error("Error while indexing to solr: %s" % str(e))
-        raise
 
 
 def add_revision(request, media, data):
@@ -214,8 +142,18 @@ def add_revision(request, media, data):
     workflow.initialize(revision_adapter)
     
     media()
-    path = '/'.join(nodepath(media) + [revision.__name__])
-    index_metadata(solr_config(media), revision, path)
+    
+    physical_path = '/'.join(nodepath(revision))
+    try:
+        size = os.path.getsize(physical_path)
+    except OSError, e:
+        size = 0
+    index_doc(solr_config(media),
+              revision_adapter,
+              revision=revision.__name__,
+              path='/'.join(nodepath(media) + [revision.__name__]),
+              physical_path=physical_path,
+              size=size)
 
 
 def update_revision(request, revision, data):
@@ -233,9 +171,20 @@ def update_revision(request, revision, data):
         metadata.creator = authenticated_userid(request)
     set_binary(revision.model, data)
     set_metadata(metadata, data)
+    
     revision()
-    path = '/'.join(nodepath(revision))
-    index_metadata(solr_config(revision), revision.model, path)
+    
+    physical_path = '/'.join(nodepath(revision.model))
+    try:
+        size = os.path.getsize(physical_path)
+    except OSError, e:
+        size = 0
+    index_doc(solr_config(revision),
+              revision,
+              revision=revision.model.__name__,
+              path='/'.join(nodepath(revision)),
+              physical_path=physical_path,
+              size=size)
 
 
 class RevisionAdapter(AdapterNode):

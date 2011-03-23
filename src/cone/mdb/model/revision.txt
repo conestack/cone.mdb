@@ -27,17 +27,23 @@ Revision
 
 ``sorl_date``::
 
-    >>> from cone.mdb.model.revision import solr_date
+XXX: move to cone.mdb.solr
+
+    >>> from cone.mdb.solr import solr_date
     >>> dt = datetime(2011, 3, 16)
     >>> solr_date(dt)
     '2011-03-16T00:00:00Z'
     
     >>> solr_date(None)
 
-``index_metadata``::
+``index_doc``::
 
-    >>> from cone.mdb.model.revision import index_metadata
+XXX: move to cone.mdb.solr
+
+    >>> from cone.app.browser.utils import nodepath
+    >>> from cone.mdb.solr import index_doc
     >>> from cone.mdb.model import solr_config
+    >>> from cone.mdb.model.revision import RevisionAdapter
     >>> from cone.app import root
     >>> from node.ext.mdb import Revision
     >>> revision = Revision()
@@ -45,14 +51,21 @@ Revision
     >>> revision['metadata'] = metadata
     >>> config = solr_config(root)
     >>> path = 'foo/bar/baz'
-    >>> index_metadata(config, revision, path)
+    >>> physical_path = '/'.join(nodepath(revision))
+    >>> size = 0
+    >>> index_doc(config,
+    ...           RevisionAdapter(revision, None, None),
+    ...           revision=revision.__name__,
+    ...           path=path,
+    ...           physical_path=physical_path,
+    ...           size=size)
     
     >>> from cone.mdb.solr import Metadata as SolrMetadata
-    >>> from cone.mdb.model.revision import solr_whitelist
-    >>> solr_md = SolrMetadata(config, solr_whitelist, uid='1')
+    >>> from cone.mdb.solr import SOLR_FIELDS
+    >>> solr_md = SolrMetadata(config, SOLR_FIELDS, uid='1')
     >>> solr_md.query()
     >>> solr_md.keys()
-    ['uid', 'author', 'physical_path', 'created', 'path', 'revision']
+    ['uid', 'author', 'physical_path', 'created', 'path', 'size', 'revision']
     
     >>> solr_md.path
     'foo/bar/baz'
@@ -74,7 +87,14 @@ Revision
     >>> revision['metadata'] = Metadata()
     >>> config = solr_config(root)
     >>> path = 'foo/bar/baz'
-    >>> index_metadata(config, revision, path)
+    >>> physical_path = '/'.join(nodepath(revision))
+    >>> size = 0
+    >>> index_doc(config,
+    ...           RevisionAdapter(revision, None, None),
+    ...           revision=revision.__name__,
+    ...           path=path,
+    ...           physical_path=physical_path,
+    ...           size=size)
     Traceback (most recent call last):
       ...
     SolrError: [Reason: Document [null] missing required field: uid]
@@ -246,7 +266,7 @@ Authenticate as unprivileged user and try again::
     
 Solr must be updated as well::
     
-    >>> solr_md = SolrMetadata(config, solr_whitelist)
+    >>> solr_md = SolrMetadata(config, SOLR_FIELDS)
     >>> len(solr_md.query(q=u'flag:active')) == 1
     True
     

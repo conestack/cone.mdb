@@ -1,6 +1,11 @@
 import types
+import datetime
 from lxml import etree
 from pysolr import Solr
+
+import logging
+logger = logging.getLogger('mdb')
+
 
 class Config(object):
     
@@ -35,7 +40,9 @@ class Term(object):
         self.value = value
     
     def __str__(self):
-        return self.query
+        if self.query:
+            return self.query
+        return '%s:%s' % (self.name, self.value)
     
     __repr__ = __str__
     
@@ -127,3 +134,89 @@ class Metadata(dict):
             solr = Solr('http://%s:%s/%s' % (cfg.server, cfg.port, cfg.path))
             object.__setattr__(self, '_solr', solr)
             return solr
+
+
+SOLR_FIELDS = [
+    'uid',
+    'author',
+    'created',
+    'effective',
+    'expires',
+    'revision',
+    'metatype',
+    'creator',
+    'keywords',
+    'url',
+    'relations',
+    'title',
+    'description',
+    'alttag',
+    'body',
+    'flag', # XXX: rename to state somewhen
+    'visibility',
+    'path',
+    'physical_path',
+    'modified',
+    'filename',
+    'size',
+]
+
+
+DATE_FIELDS = [
+    'created',
+    'effective',
+    'expires',
+    'modified',
+]
+
+
+def solr_date(dt):
+    """Return date string acceppted by solr.
+    
+    ``dt``
+        datetime.datetime
+    """
+    if isinstance(dt, datetime.datetime):
+        date = '%sZ' % dt.isoformat()
+        return date
+
+
+def index_doc(config, doc, **kw):
+    """Index doc metadata in solr.
+    
+    ``config``
+        cone.mdb.solr.Config
+    ``doc``
+        cone.app.model.BaseNode deriving instance
+    ``kw``
+        additional arguments to index
+    """
+    try:
+        md = dict()
+        metadata = doc.metadata
+        for key in metadata.keys():
+            # unknown fields are ignored
+            if not key in SOLR_FIELDS:
+                continue
+            # XXX: not sure if this is needed
+            if not hasattr(metadata, key):
+                continue
+            val = getattr(metadata, key)
+            # convert value to solr accepted date format if dt instance
+            if key in DATE_FIELDS:
+                date = solr_date(val)
+                if not date:
+                    continue
+                md[key] = date
+                continue
+            md[key] = val
+        for key in kw.keys():
+            # unknown fields are ignored
+            if not key in SOLR_FIELDS:
+                continue
+            md[key] = kw[key]
+        solr_md = Metadata(config, SOLR_FIELDS, **md)
+        solr_md()
+    except Exception, e:
+        logger.error("Error while indexing to solr: %s" % str(e))
+        raise
