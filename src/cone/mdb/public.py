@@ -8,20 +8,77 @@ from cone.mdb.model.revision import solr_whitelist
 class MDBError(Exception): pass
 
 
+class QueryError(Exception): pass
+
+
+class Group(object):
+    
+    def __init__(self, term):
+        self.term = term
+    
+    def __and__(self, term):
+        self.term.query = '(%s)' % self.term.query
+        return self.term & term
+    
+    def __or__(self, term):
+        self.term.query = '(%s)' % self.term.query
+        return self.term | term
+
+
+class Term(object):
+    
+    def __init__(self, name, value):
+        self.query = ''
+        self.name = name
+        self.value = value
+    
+    def __str__(self):
+        return self.query
+    
+    __repr__ = __str__
+    
+    def __and__(self, term):
+        self.extend(term, 'AND')
+        return self
+    
+    def __or__(self, term):
+        self.extend(term, 'OR')
+        return self
+    
+    def extend(self, term, operator):
+        if isinstance(term, Group):
+            if self.query:
+                self.query = '%s %s (%s)' % (
+                    self.query, operator, term.term)
+            else:
+                self.query = '%s:%s %s (%s)' % (
+                    self.name, self.value, operator, term.term)
+            return
+        if self.query:
+            self.query = '%s %s %s:%s' % (
+                self.query, operator, term.name, term.value)
+        else:
+            self.query = '%s:%s %s %s:%s' % (
+                self.name, self.value, operator, term.name, term.value)
+        term.query = self.query
+
+
 def download(request):
     uid = request.matchdict['uid']
     rev = request.matchdict.get('rev')
     root = get_root(None)
     config = solr_config(root)
-    query = 'url:%s' % uid
+    query = Term('url', uid)
     if rev:
-        query += ' AND revision:%s' % rev
+        query = query & Term('revision', rev)
     else:
-        query += ' AND flag:active'
+        query = query & Term('flag', 'active')
+    query = query & Term('visibility', 'anonymous')
     md = Metadata(config, solr_whitelist)
     result = md.query(q=query)
     if len(result) != 1:
-        raise MDBError(u'Dataset not found in SOLR')
+        raise MDBError(u'Dataset not found in SOLR. Query: %s' % query)
+    # XXX: effective, expires
     physical_path = u'/xsendfile%s.binary' % result[0]['physical_path']
     response = Response()
     response.content_type = result[0]['metatype']
@@ -31,6 +88,20 @@ def download(request):
 
 
 def search(request):
+    """
+    title: String
+    description
+    repository: String
+    uid: String (base62)
+    revision (dict):
+        revid: String
+        title: String
+        description: String
+        mimetype: String
+        filename: String
+        size: int
+        alttag: String 
+    """
     term = request.matchdict['term']
     root = get_root(None)
     config = solr_config(root)

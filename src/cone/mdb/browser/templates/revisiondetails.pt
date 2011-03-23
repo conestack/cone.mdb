@@ -19,6 +19,10 @@
             tal:content="metadata.visibility">hidden</td>
       </tr>
       <tr>
+        <td class="labelcol">Public URL</td>
+        <td tal:content="metadata.url + '/' + model.__name__">hidden</td>
+      </tr>
+      <tr>
         <td class="labelcol">Revision number</td>
         <td tal:content="model.__name__">0</td>
       </tr>
