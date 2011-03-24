@@ -183,6 +183,7 @@ class RevisionAdapter(AdapterNode):
         props.action_view = True
         props.wf_state = True
         props.wf_name = u'revision'
+        props.leaf = True
         # XXX: check in repoze.workflow the intended way for naming
         #      transitions
         props.wf_transition_names = transition_names

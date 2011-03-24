@@ -12,6 +12,7 @@ from cone.app.model import (
     BaseNodeInfo,
     registerNodeInfo,
 )
+from cone.app.browser.utils import nodepath
 from cone.mdb.model.revision import RevisionAdapter
 from cone.mdb.model.utils import (
     solr_config,
@@ -23,6 +24,7 @@ from cone.mdb.solr import index_doc
 def index_media(media):
     index_doc(solr_config(media),
               media,
+              path='/'.join(nodepath(media)),
               repository=media.__parent__.metadata.title,
               type='Media')
 
@@ -82,6 +84,7 @@ class MediaAdapter(AdapterNode):
             props = Properties()
             props.in_navtree = True
             props.editable = True
+            props.referencable = True
             props.action_up = True
             props.action_view = True
             props.action_list = True

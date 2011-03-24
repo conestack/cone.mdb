@@ -56,7 +56,7 @@ class RevisionDetails(Tile):
         for rel in relations[1:]:
             query = query | Term('uid', rel)
         md = SolrMetadata(solr_config(self.model), SOLR_FIELDS)
-        for relmd in md.query(q=query):
+        for relmd in md.query(q=query, fl='title,path'):
             ret.append({
                 'target': '%s/%s' % (self.request.application_url, relmd.path),
                 'title': relmd.title,
@@ -124,12 +124,15 @@ class RevisionForm(object):
             custom = {
                 'keywords': ([self.keywords_extractor], [], [], []),
             })
+        relations_target = make_url(
+            self.request, node=self.model.root['repositories'])
         form['relations'] = factory(
             'field:label:*relations:reference',
             value = self.relations_value,
             props = {
                 'label': 'Relations',
                 'multivalued': True,
+                'target': relations_target,
                 'vocabulary': self.relations_vocab,
             },
             custom = {
