@@ -23,10 +23,41 @@ def solr2dt(val):
     return datetime.datetime(*args)
 
 
+def chk_publication(md):
+    now = datetime.datetime.now()
+    effective = md.get('effective')
+    if effective and solr2dt(effective) > now:
+        return False
+    expires = md.get('expires')
+    if expires and solr2dt(expires) < now:
+        return False
+    return True
+
+
+revision_info_fl = 'uid,flag,revision,title,description,' + \
+                    'metatype,filename,size,alttag,effective,expires'
+
+
+def revision_info(md):
+    return {
+        'uid': md.uid,
+        'flag': md.flag,
+        'revision': md.revision,
+        'title': md.title,
+        'description': md.description,
+        'mimetype': md.metatype,
+        'filename': md.filename,
+        'size': md.size,
+        'alttag': md.get('alttag', ''),
+        'effective': md.get('effective', ''),
+        'expires': md.get('expires', ''),
+    }
+
+
 def download(request):
     uid = request.matchdict['uid']
     rev = request.matchdict.get('rev')
-    root = get_root(None)
+    root = get_root()
     config = solr_config(root)
     query = Term('url', uid)
     if rev:
@@ -35,27 +66,24 @@ def download(request):
         query = query & Term('flag', 'active')
     query = query & Term('visibility', 'anonymous')
     md = Metadata(config, SOLR_FIELDS)
-    result = md.query(q=query)
+    fl = 'effective,expires,physical_path,metatype,filename'
+    result = md.query(q=query, fl=fl)
     if len(result) != 1:
         raise MDBError(u'Dataset not found in SOLR. Query: %s' % query)
-    now = datetime.datetime.now()
-    effective = result[0].get('effective')
-    if effective and solr2dt(effective) > now:
-        raise MDBError(u'Item not effective')
-    expires = result[0].get('expires')
-    if expires and solr2dt(expires) < now:
-        raise MDBError(u'Item expired')
-    physical_path = u'/xsendfile%s.binary' % result[0]['physical_path']
+    md = result[0]
+    if not chk_publication(md):
+        raise MDBError(u'Item not effective or already expired')
+    physical_path = u'/xsendfile%s.binary' % md['physical_path']
     response = Response()
-    response.content_type = result[0]['metatype']
+    response.content_type = md['metatype']
     response.content_disposition = \
-        'attachment; filename=%s' % result[0]['filename']
+        'attachment; filename=%s' % md['filename']
     response.headers.add('X-Accel-Redirect', physical_path)
     return response
 
 
 def search(request):
-    root = get_root(None)
+    root = get_root()
     config = solr_config(root)
     result = list()
     term = '%s*~' % request.matchdict['term']
@@ -63,7 +91,7 @@ def search(request):
           & Group(Term('title', term) \
                 | Term('description', term) \
                 | Term('creator', term))
-    fl = 'uid,title,description,revision'
+    fl = 'uid,title,description,repository'
     for md in Metadata(config, SOLR_FIELDS).query(q=query, fl=fl):
         uid = str(base62(int(uuid.UUID(md.uid))))
         result.append({
@@ -73,26 +101,41 @@ def search(request):
             'repository': md.repository,
             'revisions': list(),
         })
-        rev_query = Term('url', uid)
-        fl = 'revision,title,description,metatype,filename,size,alttag'
+        rev_query = Term('url', uid) & Term('visibility', 'anonymous')
+        fl = revision_info_fl
         for rev_md in Metadata(config, SOLR_FIELDS).query(q=rev_query, fl=fl):
-            result[-1]['revisions'].append({
-                'revision': rev_md.revision,
-                'title': rev_md.title,
-                'description': rev_md.description,
-                'mimetype': rev_md.metatype,
-                'filename': rev_md.filename,
-                'size': rev_md.size,
-                'alttag': rev_md.alttag,
-            })
+            if not chk_publication(rev_md):
+                continue
+            result[-1]['revisions'].append(revision_info(rev_md))
     return result
 
 
 def access(request):
-    root = get_root(None)
-    return Response('access')
+    root = get_root()
+    config = solr_config(root)
+    uid = request.matchdict['uid']
+    query = Term('uid', uid) & Term('visibility', 'anonymous')
+    md = Metadata(config, SOLR_FIELDS)
+    fl = 'effective,expires'
+    result = md.query(q=query, fl=fl)
+    if len(result) != 1:
+        return False
+    md = result[0]
+    if not chk_publication(md):
+        return False
+    return True
 
 
 def info(request):
-    root = get_root(None)
-    return Response('info')
+    root = get_root()
+    config = solr_config(root)
+    uid = request.matchdict['uid']
+    query = Term('uid', uid) & Term('visibility', 'anonymous')
+    md = Metadata(config, SOLR_FIELDS)
+    result = md.query(q=query, fl=revision_info_fl)
+    if len(result) != 1:
+        return {}
+    md = result[0]
+    if not chk_publication(md):
+        return {}
+    return revision_info(md)

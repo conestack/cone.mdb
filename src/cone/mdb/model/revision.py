@@ -98,7 +98,7 @@ def index_revision(revision):
     path = '/'.join(nodepath(revision))
     physical_path = '/'.join(nodepath(revision.model))
     try:
-        size = os.path.getsize(physical_path)
+        size = os.path.getsize('%s.binary' % physical_path)
     except OSError, e:
         size = 0
     index_doc(solr_config(revision),
