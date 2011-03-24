@@ -62,16 +62,16 @@ Media
     ['uid', 'title', 'description', 'creator', 'created']
     
     >>> metadata.uid
-    u'...'
+    '...'
     
     >>> metadata.title
-    u'Media 3'
+    'Media 3'
     
     >>> metadata.description
-    u'Media 3 description'
+    'Media 3 description'
     
     >>> metadata.creator
-    u'andi'
+    'andi'
     
     >>> metadata.created
     datetime.datetime(...)

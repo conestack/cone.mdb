@@ -103,6 +103,7 @@ def index_revision(revision):
         size = 0
     index_doc(solr_config(revision),
               revision,
+              type='Revision',
               revision=revision.model.__name__,
               path=path,
               physical_path=physical_path,

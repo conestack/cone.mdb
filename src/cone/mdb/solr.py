@@ -146,19 +146,20 @@ SOLR_FIELDS = [
     'metatype',
     'creator',
     'keywords',
-    'url',
+    'url', # media uid base 62 XXX: rename
     'relations',
     'title',
     'description',
     'alttag',
     'body',
-    'flag', # XXX: rename to state somewhen
+    'flag', # XXX: rename to state
     'visibility',
     'path',
     'physical_path',
     'modified',
     'filename',
     'size',
+    'type',
 ]
 
 

@@ -6,13 +6,14 @@ from cone.tile import (
     tile,
     registerTile,
 )
+from cone.mdb.model import Solr
+from cone.mdb.model.media import index_media
 from cone.mdb.model.revision import index_revision
 from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
 from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
 from cone.app.browser.ajax import AjaxAction
-from cone.mdb.model import Solr
 
 
 registerTile('content',
@@ -32,6 +33,7 @@ class Rebuild(Tile):
         repositories = self.model.root['repositories']
         for repository in repositories.values():
             for media in repository.values():
+                index_media(media)
                 for revision in media.values():
                     index_revision(revision)
         url = make_url(self.request, node=self.model)

@@ -44,7 +44,8 @@ Revision
     >>> solr_md = SolrMetadata(config, SOLR_FIELDS, uid='1')
     >>> solr_md.query()
     >>> solr_md.keys()
-    ['uid', 'author', 'physical_path', 'created', 'path', 'size', 'revision']
+    ['uid', 'author', 'physical_path', 'created', 
+    'path', 'size', 'type', 'revision']
     
     >>> solr_md.path
     'foo'

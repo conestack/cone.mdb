@@ -13,7 +13,17 @@ from cone.app.model import (
     registerNodeInfo,
 )
 from cone.mdb.model.revision import RevisionAdapter
-from cone.mdb.model.utils import timestamp
+from cone.mdb.model.utils import (
+    solr_config,
+    timestamp,
+)
+from cone.mdb.solr import index_doc
+
+
+def index_media(media):
+    index_doc(solr_config(media),
+              media,
+              type='Media')
 
 
 def add_media(request, repository, title, description):
@@ -31,16 +41,15 @@ def add_media(request, repository, title, description):
     keys = MediaKeys(repository.model.__name__)
     key = keys.next()
     keys.dump(key)
-    repository = repository.model
-    model = Media()
-    repository[key] = model
-    media = MediaAdapter(model, None, None)
+    repository.model[key] = Media()
+    media = repository[key]
     media.metadata.uid = str(uuid.uuid4())
     media.metadata.title = title
     media.metadata.description = description
     media.metadata.creator = authenticated_userid(request)
     media.metadata.created = timestamp()
     media()
+    index_media(media)
 
 
 def update_media(request, media, title, description):
@@ -59,6 +68,7 @@ def update_media(request, media, title, description):
     metadata.modified = timestamp()
     metadata.modified_by = authenticated_userid(request)
     media()
+    index_media(media)
 
 
 class MediaAdapter(AdapterNode):

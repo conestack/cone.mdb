@@ -82,10 +82,10 @@ Add::
     
     >>> media = repository['d']
     >>> media.metadata.title
-    u'Media title'
+    'Media title'
     
     >>> media.metadata.description
-    u''
+    ''
 
 Edit::
 
