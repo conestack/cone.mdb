@@ -44,12 +44,12 @@ def pub_main(global_config, **settings):
     
     config.add_route(
         'download_active',
-        '/{uid}',
+        '/{suid}',
         view=public.download)
     
     config.add_route(
         'download_specific',
-        '/{uid}/{rev}',
+        '/{suid}/{rev}',
         view=public.download)
     
     config.end()

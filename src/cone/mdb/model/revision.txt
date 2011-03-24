@@ -126,7 +126,7 @@ Revision
     'Revision 99'
     
     >>> revision.metadata.keys()
-    ['author', 'created', 'state', 'creator', 'url', 'expires', 'effective', 
+    ['author', 'created', 'state', 'creator', 'expires', 'effective', 'suid', 
     'description', 'revision', 'title', 'keywords', 'relations', 'alttag', 
     'visibility', 'uid']
     

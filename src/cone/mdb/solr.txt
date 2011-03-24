@@ -54,6 +54,7 @@ Add test entry::
     >>> from datetime import datetime
     >>> entry = {
     ...   'uid': '12345',
+    ...   'suid': '123',
     ...   'author': 'robi',
     ...   'created': datetime.now(),
     ...   'effective': datetime.now(),
@@ -62,7 +63,6 @@ Add test entry::
     ...   'mimetype': 'text/plain',
     ...   'creator': 'robi',
     ...   'keywords': ['a', 'b', 'c'],
-    ...   'url': 'foo/bar/baz',
     ...   'relations': ['54321', '13246'],
     ...   'title': 'title',
     ...   'description': 'description',
@@ -95,9 +95,9 @@ Query already added entry::
     relations: ['54321', '13246']
     revision: 1.0
     state: working_copy
+    suid: 123
     title: title
     uid: 12345
-    url: foo/bar/baz
     visibility: hidden
 
 
@@ -118,7 +118,7 @@ The ``Metadata`` object::
 Valid attributes::
 
     >>> attributes = ['uid', 'author', 'created', 'effective',
-    ...     'expires', 'revision', 'mimetype', 'creator', 'keywords', 'url',
+    ...     'expires', 'revision', 'mimetype', 'creator', 'keywords', 'suid',
     ...     'relations', 'title', 'description', 'alttag', 'body', 'state',
     ...     'visibility', 'path', 'modified', 'filename']
 
@@ -143,7 +143,7 @@ Create Metadata with keywords::
     ...               mimetype='text/plain',
     ...               creator='robi1',
     ...               keywords=['a', 'b'],
-    ...               url='foo/bar/baz1',
+    ...               suid='123',
     ...               relations=['13245'],
     ...               title='title1',
     ...               description='description1',
@@ -211,7 +211,7 @@ Create Metadata and set attributes manually::
     >>> md.mimetype = 'text/plain',
     >>> md.creator = 'robi2',
     >>> md.keywords = ['b', 'c'],
-    >>> md.url = 'foo/bar/baz2',
+    >>> md.suid = '123',
     >>> md.relations = ['12346'],
     >>> md.title = 'title2',
     >>> md.description = 'description2',

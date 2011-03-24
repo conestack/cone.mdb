@@ -142,8 +142,9 @@ def add_revision(request, media, data):
     metadata = MDBMetadata()
     revision['metadata'] = metadata
     metadata.revision = key
-    metadata.uid = str(uuid.uuid4())
-    metadata.url = str(base62(int(uuid.UUID(media.metadata.uid))))
+    uid = uuid.uuid4()
+    metadata.uid = str(uid)
+    metadata.suid = str(base62(int(uid)))
     metadata.created = timestamp()
     metadata.creator = authenticated_userid(request)
     

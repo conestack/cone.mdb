@@ -138,6 +138,7 @@ class Metadata(dict):
 
 SOLR_FIELDS = [
     'uid',
+    'suid',
     'author',
     'created',
     'effective',
@@ -146,7 +147,6 @@ SOLR_FIELDS = [
     'mimetype',
     'creator',
     'keywords',
-    'url', # XXX: rename to media. contains base62 uid of media
     'relations',
     'title',
     'description',

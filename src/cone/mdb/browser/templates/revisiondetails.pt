@@ -20,7 +20,7 @@
       </tr>
       <tr>
         <td class="labelcol">Public URL</td>
-        <td tal:content="metadata.url + '/' + model.__name__">hidden</td>
+        <td tal:content="metadata.suid + '/' + model.__name__">hidden</td>
       </tr>
       <tr>
         <td class="labelcol">Revision number</td>
