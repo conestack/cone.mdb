@@ -143,10 +143,10 @@ SOLR_FIELDS = [
     'effective',
     'expires',
     'revision',
-    'metatype',
+    'metatype', # XXX: rename to mimetype
     'creator',
     'keywords',
-    'url', # media uid base 62 XXX: rename
+    'url', # XXX: rename to media. contains base62 uid of media
     'relations',
     'title',
     'description',
@@ -160,6 +160,7 @@ SOLR_FIELDS = [
     'filename',
     'size',
     'type',
+    'repository',
 ]
 
 

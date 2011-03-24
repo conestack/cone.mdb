@@ -1,5 +1,7 @@
 import time
 import datetime
+import uuid
+from bda.basen import base62
 from webob import Response
 from cone.app import get_root
 from cone.mdb.solr import (
@@ -53,34 +55,36 @@ def download(request):
 
 
 def search(request):
-    """
-    title: String
-    description
-    repository: String
-    uid: String (base62)
-    revision (dict):
-        revid: String
-        title: String
-        description: String
-        mimetype: String
-        filename: String
-        size: int
-        alttag: String 
-    """
     root = get_root(None)
     config = solr_config(root)
-    term = '%s*~' % request.matchdict['term']
-    query = Term('title', term) \
-          | Term('description', term) \
-          | Term('creator', term) \
-          | Term('author', term) \
-          | Term('body', term)
     result = list()
-    fl = 'title,description,uid,path'
+    term = '%s*~' % request.matchdict['term']
+    query = Term('type', 'Media') \
+          & Group(Term('title', term) \
+                | Term('description', term) \
+                | Term('creator', term))
+    fl = 'uid,title,description,revision'
     for md in Metadata(config, SOLR_FIELDS).query(q=query, fl=fl):
+        uid = str(base62(int(uuid.UUID(md.uid))))
         result.append({
-            'label': md.title,
+            'uid': uid,
+            'title': md.title,
+            'description': md.description,
+            'repository': md.repository,
+            'revisions': list(),
         })
+        rev_query = Term('url', uid)
+        fl = 'revision,title,description,metatype,filename,size,alttag'
+        for rev_md in Metadata(config, SOLR_FIELDS).query(q=rev_query, fl=fl):
+            result[-1]['revisions'].append({
+                'revision': rev_md.revision,
+                'title': rev_md.title,
+                'description': rev_md.description,
+                'mimetype': rev_md.metatype,
+                'filename': rev_md.filename,
+                'size': rev_md.size,
+                'alttag': rev_md.alttag,
+            })
     return result
 
 

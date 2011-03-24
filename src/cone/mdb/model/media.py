@@ -23,6 +23,7 @@ from cone.mdb.solr import index_doc
 def index_media(media):
     index_doc(solr_config(media),
               media,
+              repository=media.__parent__.metadata.title,
               type='Media')
 
 
