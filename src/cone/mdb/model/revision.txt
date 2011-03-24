@@ -126,9 +126,9 @@ Revision
     'Revision 99'
     
     >>> revision.metadata.keys()
-    ['author', 'created', 'creator', 'url', 'expires', 'effective', 
-    'description', 'revision', 'flag', 'title', 'keywords', 'relations', 
-    'alttag', 'visibility', 'uid']
+    ['author', 'created', 'state', 'creator', 'url', 'expires', 'effective', 
+    'description', 'revision', 'title', 'keywords', 'relations', 'alttag', 
+    'visibility', 'uid']
     
     >>> revision.properties.keys()
     ['wf_name', 'editable', 'wf_transition_names', 'action_view', 
@@ -223,7 +223,7 @@ Authenticate as unprivileged user and try again::
 Solr must be updated as well::
     
     >>> solr_md = SolrMetadata(config, SOLR_FIELDS)
-    >>> len(solr_md.query(q=u'flag:active')) == 1
+    >>> len(solr_md.query(q=u'state:active')) == 1
     True
     
     >>> transitions = workflow.get_transitions(

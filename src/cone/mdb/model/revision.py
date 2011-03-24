@@ -53,7 +53,7 @@ def persist_state(revision, info):
                 request = get_current_request()
                 workflow = info.workflow
                 workflow.transition(val, request, u'active_2_working_copy')
-    revision.metadata.flag = info.transition[u'to_state']
+    revision.metadata.state = info.transition[u'to_state']
     revision()
     index_revision(revision)
 
@@ -187,8 +187,7 @@ class RevisionAdapter(AdapterNode):
     def properties(self):
         props = Properties()
         props.in_navtree = True
-        flag = self.state
-        props.editable = flag == u'working_copy' and True or False
+        props.editable = self.state == u'working_copy' and True or False
         props.action_up = True
         props.action_view = True
         props.wf_state = True
@@ -208,10 +207,10 @@ class RevisionAdapter(AdapterNode):
         return Properties()                                 #pragma NO COVERAGE
     
     def _get_state(self):
-        return self.metadata.flag
+        return self.metadata.state
     
     def _set_state(self, val):
-        self.metadata.flag = val
+        self.metadata.state = val
     
     state = property(_get_state, _set_state)
     

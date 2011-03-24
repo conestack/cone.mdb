@@ -34,14 +34,14 @@ def chk_publication(md):
     return True
 
 
-revision_info_fl = 'uid,flag,revision,title,description,' + \
+revision_info_fl = 'uid,state,revision,title,description,' + \
                     'mimetype,filename,size,alttag,effective,expires'
 
 
 def revision_info(md):
     return {
         'uid': md.uid,
-        'flag': md.flag,
+        'state': md.state,
         'revision': md.revision,
         'title': md.title,
         'description': md.description,
@@ -63,7 +63,7 @@ def download(request):
     if rev:
         query = query & Term('revision', rev)
     else:
-        query = query & Term('flag', 'active')
+        query = query & Term('state', 'active')
     query = query & Term('visibility', 'anonymous')
     md = Metadata(config, SOLR_FIELDS)
     fl = 'effective,expires,physical_path,mimetype,filename'
@@ -93,15 +93,16 @@ def search(request):
                 | Term('creator', term))
     fl = 'uid,title,description,repository'
     for md in Metadata(config, SOLR_FIELDS).query(q=query, fl=fl):
-        uid = str(base62(int(uuid.UUID(md.uid))))
+        url = str(base62(int(uuid.UUID(md.uid))))
         result.append({
-            'uid': uid,
+            'url': url,
+            'uid': md.uid,
             'title': md.title,
             'description': md.description,
             'repository': md.repository,
             'revisions': list(),
         })
-        rev_query = Term('url', uid) & Term('visibility', 'anonymous')
+        rev_query = Term('url', url) & Term('visibility', 'anonymous')
         fl = revision_info_fl
         for rev_md in Metadata(config, SOLR_FIELDS).query(q=rev_query, fl=fl):
             if not chk_publication(rev_md):

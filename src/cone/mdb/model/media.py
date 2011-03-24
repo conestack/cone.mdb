@@ -111,7 +111,7 @@ class MediaAdapter(AdapterNode):
     @property
     def active_revision(self):
         for key in self.keys():
-            if self[key].metadata.flag == 'active':
+            if self[key].metadata.state == 'active':
                 return self[key]
     
     def __getitem__(self, name):

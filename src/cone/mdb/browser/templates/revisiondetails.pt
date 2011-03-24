@@ -10,8 +10,8 @@
     <table class="revisiondetails">
       <tr>
         <td class="labelcol">State</td>
-        <td class="${metadata.flag}"
-            tal:content="metadata.flag">working_copy</td>
+        <td class="${metadata.state}"
+            tal:content="metadata.state">working_copy</td>
       </tr>
       <tr>
         <td class="labelcol">Visibility</td>

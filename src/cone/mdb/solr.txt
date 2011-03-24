@@ -68,7 +68,7 @@ Add test entry::
     ...   'description': 'description',
     ...   'alttag': 'alttag',
     ...   'body': ['body text 1', 'body text 2'],
-    ...   'flag': 'working_copy',
+    ...   'state': 'working_copy',
     ...   'visibility': 'hidden',
     ...   'path': '/bla/bla',
     ...   'modified': datetime.now(),
@@ -87,13 +87,14 @@ Query already added entry::
     description: description
     effective: ...
     expires: ...
-    flag: working_copy
+    filename: foo.txt
     keywords: ['a', 'b', 'c']
     mimetype: text/plain
     modified: ...
     path: /bla/bla
     relations: ['54321', '13246']
     revision: 1.0
+    state: working_copy
     title: title
     uid: 12345
     url: foo/bar/baz
@@ -118,7 +119,7 @@ Valid attributes::
 
     >>> attributes = ['uid', 'author', 'created', 'effective',
     ...     'expires', 'revision', 'mimetype', 'creator', 'keywords', 'url',
-    ...     'relations', 'title', 'description', 'alttag', 'body', 'flag',
+    ...     'relations', 'title', 'description', 'alttag', 'body', 'state',
     ...     'visibility', 'path', 'modified', 'filename']
 
 Create Metadata with invalid kw::

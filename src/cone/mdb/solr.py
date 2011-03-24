@@ -152,7 +152,7 @@ SOLR_FIELDS = [
     'description',
     'alttag',
     'body',
-    'flag', # XXX: rename to state
+    'state',
     'visibility',
     'path',
     'physical_path',
