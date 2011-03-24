@@ -108,9 +108,11 @@ def index_revision(revision):
         revision.metadata.get('alttag', ''),
         ', '.join(revision.metadata.get('keywords', [])),
     ])
+    mimetype = revision.metadata.get('mimetype', '')
     index_doc(solr_config(revision),
               revision,
               type='Revision',
+              mimetype=mimetype,
               revision=revision.model.__name__,
               path=path,
               physical_path=physical_path,

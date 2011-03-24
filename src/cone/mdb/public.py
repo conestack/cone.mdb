@@ -45,7 +45,7 @@ def revision_info(md):
         'revision': md.revision,
         'title': md.title,
         'description': md.description,
-        'mimetype': md.metatype,
+        'mimetype': md.mimetype,
         'filename': md.filename,
         'size': md.size,
         'alttag': md.get('alttag', ''),
