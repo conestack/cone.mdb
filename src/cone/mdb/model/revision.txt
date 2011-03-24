@@ -92,13 +92,6 @@ Revision
     ...     'data': 'Contents from Textfile 3',
     ...     'visibility': 'hidden',
     ... }
-    >>> data['body'] = ' '.join([
-    ...     data['title'],
-    ...     data['description'], 
-    ...     data['author'],
-    ...     data['alttag'],
-    ...     ', '.join(data['keywords']),
-    ... ])
     >>> add_revision(request, media, data)
     
     >>> media.keys()
@@ -120,14 +113,6 @@ Revision
     ...     'data': 'Contents from Textfile 99',
     ...     'visibility': 'hidden',
     ... }
-    >>> data['body'] = ' '.join([
-    ...     data['title'],
-    ...     data['description'], 
-    ...     data['author'],
-    ...     data['alttag'],
-    ...     ', '.join(data['keywords']),
-    ... ])
-    
     >>> update_revision(request, revision, data)
 
 ``RevisionAdapter``::
@@ -142,12 +127,12 @@ Revision
     
     >>> revision.metadata.keys()
     ['author', 'created', 'creator', 'url', 'expires', 'effective', 
-    'description', 'body', 'revision', 'flag', 'title', 'keywords', 
-    'relations', 'alttag', 'visibility', 'uid']
+    'description', 'revision', 'flag', 'title', 'keywords', 'relations', 
+    'alttag', 'visibility', 'uid']
     
     >>> revision.properties.keys()
     ['wf_name', 'editable', 'wf_transition_names', 'action_view', 
-    'action_up', 'in_navtree', 'wf_state']
+    'action_up', 'leaf', 'in_navtree', 'wf_state']
     
     >>> revision.properties.action_view
     True

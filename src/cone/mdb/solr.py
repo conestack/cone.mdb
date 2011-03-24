@@ -143,7 +143,7 @@ SOLR_FIELDS = [
     'effective',
     'expires',
     'revision',
-    'metatype', # XXX: rename to mimetype
+    'mimetype',
     'creator',
     'keywords',
     'url', # XXX: rename to media. contains base62 uid of media

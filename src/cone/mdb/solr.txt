@@ -59,7 +59,7 @@ Add test entry::
     ...   'effective': datetime.now(),
     ...   'expires': datetime.now(),
     ...   'revision': 1.0,
-    ...   'metatype': 'text/plain',
+    ...   'mimetype': 'text/plain',
     ...   'creator': 'robi',
     ...   'keywords': ['a', 'b', 'c'],
     ...   'url': 'foo/bar/baz',
@@ -89,7 +89,7 @@ Query already added entry::
     expires: ...
     flag: working_copy
     keywords: ['a', 'b', 'c']
-    metatype: text/plain
+    mimetype: text/plain
     modified: ...
     path: /bla/bla
     relations: ['54321', '13246']
@@ -117,7 +117,7 @@ The ``Metadata`` object::
 Valid attributes::
 
     >>> attributes = ['uid', 'author', 'created', 'effective',
-    ...     'expires', 'revision', 'metatype', 'creator', 'keywords', 'url',
+    ...     'expires', 'revision', 'mimetype', 'creator', 'keywords', 'url',
     ...     'relations', 'title', 'description', 'alttag', 'body', 'flag',
     ...     'visibility', 'path', 'modified', 'filename']
 
@@ -139,7 +139,7 @@ Create Metadata with keywords::
     ...               effective=datetime.now(),
     ...               expires=datetime.now(),
     ...               revision=1.1,
-    ...               metatype='text/plain',
+    ...               mimetype='text/plain',
     ...               creator='robi1',
     ...               keywords=['a', 'b'],
     ...               url='foo/bar/baz1',
@@ -207,7 +207,7 @@ Create Metadata and set attributes manually::
     >>> md.effective = datetime.now(),
     >>> md.expires = datetime.now(),
     >>> md.revision = '1.1',
-    >>> md.metatype = 'text/plain',
+    >>> md.mimetype = 'text/plain',
     >>> md.creator = 'robi2',
     >>> md.keywords = ['b', 'c'],
     >>> md.url = 'foo/bar/baz2',

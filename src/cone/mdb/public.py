@@ -35,7 +35,7 @@ def chk_publication(md):
 
 
 revision_info_fl = 'uid,flag,revision,title,description,' + \
-                    'metatype,filename,size,alttag,effective,expires'
+                    'mimetype,filename,size,alttag,effective,expires'
 
 
 def revision_info(md):
@@ -66,7 +66,7 @@ def download(request):
         query = query & Term('flag', 'active')
     query = query & Term('visibility', 'anonymous')
     md = Metadata(config, SOLR_FIELDS)
-    fl = 'effective,expires,physical_path,metatype,filename'
+    fl = 'effective,expires,physical_path,mimetype,filename'
     result = md.query(q=query, fl=fl)
     if len(result) != 1:
         raise MDBError(u'Dataset not found in SOLR. Query: %s' % query)
@@ -75,7 +75,7 @@ def download(request):
         raise MDBError(u'Item not effective or already expired')
     physical_path = u'/xsendfile%s.binary' % md['physical_path']
     response = Response()
-    response.content_type = md['metatype']
+    response.content_type = md['mimetype']
     response.content_disposition = \
         'attachment; filename=%s' % md['filename']
     response.headers.add('X-Accel-Redirect', physical_path)

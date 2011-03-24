@@ -56,13 +56,6 @@ class Database(Layer):
                 'data': 'Contents from Textfile %i' % i,
                 'visibility': 'hidden',
             }
-            data['body'] = ' '.join([
-                data['title'],
-                data['description'], 
-                data['author'],
-                data['alttag'],
-                ', '.join(data['keywords']),
-            ])
             add_revision(request, media, data)
     
     def setUp(self, args=None):

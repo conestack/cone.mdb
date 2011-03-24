@@ -71,7 +71,7 @@
       </tr>
       <tr>
         <td class="labelcol">Mimetype</td>
-        <td tal:content="metadata.metatype">text/plain</td>
+        <td tal:content="metadata.mimetype">text/plain</td>
       </tr>
       <tr>
         <td class="labelcol">Alttag</td>

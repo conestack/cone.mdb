@@ -68,7 +68,7 @@ class RevisionDetails(Tile):
 def download(model, request):
     response_factory = queryUtility(IResponseFactory, default=Response)
     response = response_factory(model.model['binary'].payload)
-    response.content_type = model.metadata.metatype
+    response.content_type = model.metadata.mimetype
     response.content_disposition = 'attachment'
     return response
 
@@ -210,7 +210,7 @@ class RevisionForm(object):
             return vocab
         md = SolrMetadata(solr_config(self.model), SOLR_FIELDS)
         for relation in relations:
-            rel = md.query(q='uid:%s' % relation)
+            rel = md.query(q='uid:%s' % relation, fl='title')
             if rel and rel[0].get('title'):
                 title = rel[0].title
             else:
@@ -272,13 +272,6 @@ class RevisionForm(object):
             'data': f(data, u'data'),
             'visibility': f(data, u'visibility'),
         }
-        data['body'] = ' '.join([
-            data['title'],
-            data['description'], 
-            data['author'],
-            data['alttag'],
-            ', '.join(data['keywords']),
-        ])
         return data
 
 

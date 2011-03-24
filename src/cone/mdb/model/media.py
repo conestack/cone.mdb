@@ -22,11 +22,17 @@ from cone.mdb.solr import index_doc
 
 
 def index_media(media):
+    body = ' '.join([
+        media.metadata.get('title', ''),
+        media.metadata.get('description', ''), 
+        media.metadata.get('author', ''),
+    ])
     index_doc(solr_config(media),
               media,
               path='/'.join(nodepath(media)),
               repository=media.__parent__.metadata.title,
-              type='Media')
+              type='Media',
+              body=body)
 
 
 def add_media(request, repository, title, description):

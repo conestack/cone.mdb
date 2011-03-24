@@ -89,7 +89,7 @@ def set_binary(revision, data):
             payload = file
         else:
             payload = file['file'].read()
-            metadata.metatype = file['mimetype']
+            metadata.mimetype = file['mimetype']
             metadata.filename = file['filename']
     revision['binary'] = MDBBinary(payload=payload)
 
@@ -101,13 +101,21 @@ def index_revision(revision):
         size = os.path.getsize('%s.binary' % physical_path)
     except OSError, e:
         size = 0
+    body = ' '.join([
+        revision.metadata.get('title', ''),
+        revision.metadata.get('description', ''), 
+        revision.metadata.get('author', ''),
+        revision.metadata.get('alttag', ''),
+        ', '.join(revision.metadata.get('keywords', [])),
+    ])
     index_doc(solr_config(revision),
               revision,
               type='Revision',
               revision=revision.model.__name__,
               path=path,
               physical_path=physical_path,
-              size=size)
+              size=size,
+              body=body)
 
 
 def add_revision(request, media, data):

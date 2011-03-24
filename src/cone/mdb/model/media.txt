@@ -37,7 +37,8 @@ Media
     
     >>> properties = media.properties
     >>> properties.keys()
-    ['action_view', 'editable', 'in_navtree', 'action_list', 'action_up']
+    ['referencable', 'action_list', 'editable', 
+    'action_view', 'action_up', 'in_navtree']
     
     >>> properties.action_view
     True
