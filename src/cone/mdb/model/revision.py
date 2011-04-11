@@ -188,7 +188,7 @@ class RevisionAdapter(AdapterNode):
     def properties(self):
         props = Properties()
         props.in_navtree = True
-        props.editable = self.state == u'working_copy' and True or False
+        props.editable = self.state == u'working_copy'
         props.action_up = True
         props.action_view = True
         props.wf_state = True

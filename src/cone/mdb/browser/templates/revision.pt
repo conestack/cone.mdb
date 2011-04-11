@@ -4,5 +4,5 @@
     <tal:contents replace="structure tile('contextmenu')" />
     <tal:contents replace="structure tile('byline')" />
     <tal:contents replace="structure tile('revisiondetails')" />
-  </divclass>
+  </div>
 </tal:ajax>
