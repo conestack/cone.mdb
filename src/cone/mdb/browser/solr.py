@@ -13,7 +13,10 @@ from cone.app.browser.layout import ProtectedContentTile
 from cone.app.browser.form import Form
 from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
-from cone.app.browser.ajax import AjaxAction
+from cone.app.browser.ajax import (
+    ajax_continue,
+    AjaxAction,
+)
 
 
 registerTile('content',
@@ -38,7 +41,7 @@ class Rebuild(Tile):
                     index_revision(revision)
         url = make_url(self.request, node=self.model)
         continuation = [AjaxAction(url, 'content', 'inner', '.solr')]
-        self.request.environ['cone.app.continuation'] = continuation
+        ajax_continue(self.request, continuation)
         return u''
 
 
