@@ -15,6 +15,7 @@ from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
 from cone.app.browser.ajax import (
     ajax_continue,
+    ajax_message,
     AjaxAction,
 )
 
@@ -34,14 +35,21 @@ class Rebuild(Tile):
         url = 'http://%s:%s/%s/' % (conf.server, conf.port, conf.basepath)
         PySolr(url).delete(q='*:*')
         repositories = self.model.root['repositories']
+        count = 0
         for repository in repositories.values():
             for media in repository.values():
                 index_media(media)
                 for revision in media.values():
                     index_revision(revision)
+                    count += 1
         url = make_url(self.request, node=self.model)
         continuation = [AjaxAction(url, 'content', 'inner', '.solr')]
         ajax_continue(self.request, continuation)
+        message = 'Rebuilt SOLR catalog. Catalog contains now %i items' % count
+        ajax_message(self.request, message, 'info')
+        return u''
+        
+        
         return u''
 
 
