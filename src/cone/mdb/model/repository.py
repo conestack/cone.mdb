@@ -101,4 +101,5 @@ info.title = 'Repository'
 info.description = 'A repository.'
 info.node = RepositoryAdapter
 info.addables = ['media']
+info.icon = 'mdb-static/images/repository16_16.png'
 registerNodeInfo('repository', info)

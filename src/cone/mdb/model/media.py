@@ -134,4 +134,5 @@ info.title = 'Media'
 info.description = 'A media object.'
 info.node = MediaAdapter
 info.addables = ['revision']
+info.icon = 'mdb-static/images/media16_16.png'
 registerNodeInfo('media', info)

@@ -61,5 +61,5 @@ info.title = 'Repositories'
 info.description = 'Collection of repositories.'
 info.node = Repositories
 info.addables = ['repository']
-info.in_navtree = True
+info.icon = 'mdb-static/images/repositories16_16.png'
 registerNodeInfo('repositories', info)

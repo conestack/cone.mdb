@@ -229,4 +229,5 @@ info.title = 'Revision'
 info.description = 'A revision.'
 info.node = RevisionAdapter
 info.addables = []
+info.icon = 'mdb-static/images/revision16_16.png'
 registerNodeInfo('revision', info)
