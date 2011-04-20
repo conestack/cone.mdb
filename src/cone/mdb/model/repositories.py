@@ -1,4 +1,5 @@
 import os
+import shutil
 from cone.app.model import (
     BaseNode,
     Properties,
@@ -55,10 +56,12 @@ class Repositories(BaseNode, DBLocation):
             return repo
     
     def __delitem__(self, key):
-        print 'del in repositories'
+        BaseNode.__delitem__(self, key)
+        repositorypath = os.path.join(self.dbpath, key)
+        shutil.rmtree(repositorypath)
     
     def __call__(self):
-        print 'call in repositories'
+        pass
 
 
 info = BaseNodeInfo()

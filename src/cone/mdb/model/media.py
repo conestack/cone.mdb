@@ -126,7 +126,9 @@ class MediaAdapter(AdapterNode):
             return revision
     
     def __delitem__(self, key):
-        print 'del in media'
+        model = self.model
+        AdapterNode.__delitem__(self, key)
+        del model[key]
     
     def __call__(self):
         self.model()

@@ -93,7 +93,9 @@ class RepositoryAdapter(AdapterNode, DBLocation):
             return media
     
     def __delitem__(self, key):
-        print 'del in repository'
+        model = self.model
+        AdapterNode.__delitem__(self, key)
+        del model[key]
     
     def __call__(self):
         self.model()
