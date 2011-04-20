@@ -25,9 +25,12 @@ Repository
     
     >>> properties = repository.properties
     >>> properties.keys()
-    ['editable', 'in_navtree', 'action_up']
+    ['action_up', 'editable', 'in_navtree', 'deletable']
     
     >>> properties.editable
+    True
+    
+    >>> properties.deletable
     True
     
     >>> properties.in_navtree

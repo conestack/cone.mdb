@@ -14,10 +14,7 @@ Reporitories is a registered plugin on root::
 Configured properties::
 
     >>> repositories.properties.keys()
-    ['editable', 'in_navtree']
-    
-    >>> repositories.properties.editable
-    False
+    ['in_navtree']
     
     >>> repositories.properties.in_navtree = True
 

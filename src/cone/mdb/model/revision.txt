@@ -132,12 +132,15 @@ Revision
     
     >>> revision.properties.keys()
     ['wf_name', 'editable', 'wf_transition_names', 'action_view', 
-    'action_up', 'leaf', 'in_navtree', 'wf_state']
+    'deletable', 'action_up', 'leaf', 'in_navtree', 'wf_state']
     
     >>> revision.properties.action_view
     True
     
     >>> revision.properties.editable
+    True
+    
+    >>> revision.properties.deletable
     True
     
     >>> revision.properties.in_navtree
