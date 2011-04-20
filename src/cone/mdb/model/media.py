@@ -90,6 +90,7 @@ class MediaAdapter(AdapterNode):
             props = Properties()
             props.in_navtree = True
             props.editable = True
+            props.deletable = True
             props.referencable = True
             props.action_up = True
             props.action_view = True

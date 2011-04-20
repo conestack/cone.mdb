@@ -22,7 +22,6 @@ class Repositories(BaseNode, DBLocation):
         if not hasattr(self, '_properties'):
             props = Properties()
             props.in_navtree = True
-            props.editable = False
             self._properties = props
         return self._properties
     

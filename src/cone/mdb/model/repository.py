@@ -67,6 +67,7 @@ class RepositoryAdapter(AdapterNode, DBLocation):
             props = Properties()
             props.in_navtree = True
             props.editable = True
+            props.deletable = True
             props.action_up = True
             self._properties = props
         return self._properties
