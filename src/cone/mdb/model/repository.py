@@ -82,15 +82,18 @@ class RepositoryAdapter(AdapterNode, DBLocation):
             return self._metadata
         return Properties()                                 #pragma NO COVERAGE
     
-    def __getitem__(self, name):
+    def __getitem__(self, key):
         try:
-            return AdapterNode.__getitem__(self, name)
+            return AdapterNode.__getitem__(self, key)
         except KeyError:
-            if not name in self.iterkeys():
-                raise KeyError(name)
-            media = MediaAdapter(self.model[name], name, self)
-            self[name] = media
+            if not key in self.iterkeys():
+                raise KeyError(key)
+            media = MediaAdapter(self.model[key], key, self)
+            self[key] = media
             return media
+    
+    def __delitem__(self, key):
+        print 'del in repository'
     
     def __call__(self):
         self.model()

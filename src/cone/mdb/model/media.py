@@ -115,15 +115,18 @@ class MediaAdapter(AdapterNode):
             if self[key].metadata.state == 'active':
                 return self[key]
     
-    def __getitem__(self, name):
+    def __getitem__(self, key):
         try:
-            return AdapterNode.__getitem__(self, name)
+            return AdapterNode.__getitem__(self, key)
         except KeyError:
-            if not name in self.iterkeys():
-                raise KeyError(name)
-            revision = RevisionAdapter(self.model[name], name, self)
-            self[name] = revision
+            if not key in self.iterkeys():
+                raise KeyError(key)
+            revision = RevisionAdapter(self.model[key], key, self)
+            self[key] = revision
             return revision
+    
+    def __delitem__(self, key):
+        print 'del in media'
     
     def __call__(self):
         self.model()

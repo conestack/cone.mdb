@@ -43,16 +43,22 @@ class Repositories(BaseNode, DBLocation):
     
     iterkeys = __iter__
     
-    def __getitem__(self, name):
+    def __getitem__(self, key):
         try:
-            return BaseNode.__getitem__(self, name)
+            return BaseNode.__getitem__(self, key)
         except KeyError:
-            if not name in self.iterkeys():
-                raise KeyError(name)
-            repositorypath = os.path.join(self.dbpath, name)
-            repo = RepositoryAdapter(Repository(repositorypath), name, self)
-            self[name] = repo
+            if not key in self.iterkeys():
+                raise KeyError(key)
+            repositorypath = os.path.join(self.dbpath, key)
+            repo = RepositoryAdapter(Repository(repositorypath), key, self)
+            self[key] = repo
             return repo
+    
+    def __delitem__(self, key):
+        print 'del in repositories'
+    
+    def __call__(self):
+        print 'call in repositories'
 
 
 info = BaseNodeInfo()

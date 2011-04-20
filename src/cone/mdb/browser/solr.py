@@ -48,9 +48,6 @@ class Rebuild(Tile):
         message = 'Rebuilt SOLR catalog. Catalog contains now %i items' % count
         ajax_message(self.request, message, 'info')
         return u''
-        
-        
-        return u''
 
 
 @tile('editform', interface=Solr, permission="manage")
