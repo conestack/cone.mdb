@@ -39,6 +39,7 @@ class Rebuild(Tile):
         for repository in repositories.values():
             for media in repository.values():
                 index_media(media)
+                count += 1
                 for revision in media.values():
                     index_revision(revision)
                     count += 1
