@@ -18,6 +18,7 @@ Repository
     ...                'repo3',
     ...                'Repository 3',
     ...                'Repository 3 description')
+    <RepositoryAdapter object 'None' at ...>
     
     >>> repository = repositories['repo3']
     >>> repository

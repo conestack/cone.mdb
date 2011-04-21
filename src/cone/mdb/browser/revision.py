@@ -289,9 +289,11 @@ class RevisionAddForm(RevisionForm, Form):
     __plumbing__ = AddPart
     
     def save(self, widget, data):
-        add_revision(self.request,
-                     self.model.__parent__,
-                     self.revision_data(data))
+        revision = add_revision(
+            self.request,
+            self.model.__parent__,
+            self.revision_data(data))
+        self.model.__name__ = revision.__name__
         
 
 @tile('editform', interface=RevisionAdapter, permission="edit")

@@ -39,6 +39,7 @@ def add_repository(request, repositories, id, title, description):
     metadata.creator = authenticated_userid(request)
     metadata.created = timestamp()
     repository()
+    return repository
 
 
 def update_repository(request, repository, title, description):
@@ -111,6 +112,9 @@ class RepositoryAdapter(AdapterNode, DBLocation):
                 unindex_doc(config, media)
                 for revision in media.values():
                     unindex_doc(config, revision)
+                path = os.path.join(self.model.__name__,
+                                    *media.model.mediapath + ['media.info'])
+                os.remove(path)
                 del self.model[media.__name__]
             del self._todelete
         self.model()

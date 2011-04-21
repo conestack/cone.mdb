@@ -63,6 +63,7 @@ def add_media(request, repository, title, description):
     media.metadata.created = timestamp()
     media()
     index_media(media)
+    return media
 
 
 def update_media(request, media, title, description):

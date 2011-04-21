@@ -86,11 +86,12 @@ class MediaAddForm(MediaForm, Form):
     __plumbing__ = AddPart
     
     def save(self, widget, data):
-        add_media(
+        media = add_media(
             self.request,
             self.model.__parent__,
             data.fetch('mediaform.title').extracted,
             data.fetch('mediaform.description').extracted)
+        self.model.__name__ = media.__name__
 
 
 @tile('editform', interface=MediaAdapter, permission="edit")

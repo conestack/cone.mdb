@@ -158,6 +158,7 @@ def add_revision(request, media, data):
     
     media()
     index_revision(revision_adapter)
+    return revision_adapter
 
 
 def update_revision(request, revision, data):

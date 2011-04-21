@@ -101,13 +101,13 @@ class RepositoryAddForm(RepositoryForm, Form):
     __plumbing__ = AddPart
     
     def save(self, widget, data):
+        self.model.__name__ = data.fetch('repositoryform.id').extracted
         add_repository(
             self.request,
             self.model.__parent__,
             data.fetch('repositoryform.id').extracted,
             data.fetch('repositoryform.title').extracted,
             data.fetch('repositoryform.description').extracted)
-
 
 @tile('editform', interface=RepositoryAdapter, permission="edit")
 class RepositoryEditForm(RepositoryForm, Form):

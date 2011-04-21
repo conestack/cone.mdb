@@ -93,6 +93,7 @@ Revision
     ...     'visibility': 'hidden',
     ... }
     >>> add_revision(request, media, data)
+    <RevisionAdapter object '2' at ...>
     
     >>> media.keys()
     ['1', '0', '2']
