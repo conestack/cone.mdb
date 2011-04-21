@@ -1,5 +1,7 @@
 import os
 import shutil
+from node.locking import locktree
+from node.ext.mdb import Repository
 from cone.app.model import (
     BaseNode,
     Properties,
@@ -7,8 +9,11 @@ from cone.app.model import (
     BaseNodeInfo,
     registerNodeInfo,
 )
-from node.ext.mdb import Repository
-from cone.mdb.model.utils import DBLocation
+from cone.mdb.solr import unindex_doc
+from cone.mdb.model.utils import (
+    solr_config,
+    DBLocation,
+)
 from cone.mdb.model.repository import RepositoryAdapter
 
 
@@ -55,13 +60,28 @@ class Repositories(BaseNode, DBLocation):
             self[key] = repo
             return repo
     
+    @locktree
     def __delitem__(self, key):
+        todelete = self[key]
+        if hasattr(self, '_todelete'):
+            self._todelete.append(todelete)
+        else:
+            self._todelete = [todelete]
         BaseNode.__delitem__(self, key)
-        repositorypath = os.path.join(self.dbpath, key)
-        shutil.rmtree(repositorypath)
     
+    @locktree
     def __call__(self):
-        pass
+        if not hasattr(self, '_todelete'):
+            return
+        config = solr_config(self)
+        for repository in self._todelete:
+            for media in repository.values():
+                unindex_doc(config, media)
+                for revision in media.values():
+                    unindex_doc(config, revision)
+            path = os.path.join(self.dbpath, repository.__name__)
+            shutil.rmtree(path)
+        del self._todelete
 
 
 info = BaseNodeInfo()

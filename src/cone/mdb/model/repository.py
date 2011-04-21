@@ -1,4 +1,6 @@
 import os
+from node.locking import locktree
+from node.ext.mdb import Repository
 from pyramid.security import authenticated_userid
 from cone.app.model import (
     Properties,
@@ -7,13 +9,13 @@ from cone.app.model import (
     BaseNodeInfo,
     registerNodeInfo,
 )
-from node.ext.mdb import Repository
+from cone.mdb.solr import unindex_doc
 from cone.mdb.model.media import MediaAdapter
 from cone.mdb.model.utils import (
     DBLocation,
     timestamp,
+    solr_config,
 )
-
 
 def add_repository(request, repositories, id, title, description):
     """Create and add repository.
@@ -92,12 +94,25 @@ class RepositoryAdapter(AdapterNode, DBLocation):
             self[key] = media
             return media
     
+    @locktree
     def __delitem__(self, key):
-        model = self.model
+        todelete = self[key]
+        if hasattr(self, '_todelete'):
+            self._todelete.append(todelete)
+        else:
+            self._todelete = [todelete]
         AdapterNode.__delitem__(self, key)
-        del model[key]
     
+    @locktree
     def __call__(self):
+        if hasattr(self, '_todelete'):
+            config = solr_config(self)
+            for media in self._todelete:
+                unindex_doc(config, media)
+                for revision in media.values():
+                    unindex_doc(config, revision)
+                del self.model[media.__name__]
+            del self._todelete
         self.model()
         self.metadata()
 

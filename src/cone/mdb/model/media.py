@@ -1,10 +1,11 @@
 import os
 import uuid
-from pyramid.security import authenticated_userid
+from node.locking import locktree
 from node.ext.mdb import (
     Media,
     MediaKeys,
 )
+from pyramid.security import authenticated_userid
 from cone.app.model import (
     Properties,
     XMLProperties,
@@ -18,7 +19,10 @@ from cone.mdb.model.utils import (
     solr_config,
     timestamp,
 )
-from cone.mdb.solr import index_doc
+from cone.mdb.solr import (
+    index_doc,
+    unindex_doc,
+)
 
 
 def index_media(media):
@@ -125,12 +129,23 @@ class MediaAdapter(AdapterNode):
             self[key] = revision
             return revision
     
+    @locktree
     def __delitem__(self, key):
-        model = self.model
+        todelete = self[key]
+        if hasattr(self, '_todelete'):
+            self._todelete.append(todelete)
+        else:
+            self._todelete = [todelete]
         AdapterNode.__delitem__(self, key)
-        del model[key]
     
+    @locktree
     def __call__(self):
+        if hasattr(self, '_todelete'):
+            config = solr_config(self)
+            for revision in self._todelete:
+                unindex_doc(config, revision)
+                del self.model[revision.__name__]
+            del self._todelete
         self.model()
         self.metadata()
 

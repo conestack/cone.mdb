@@ -222,3 +222,14 @@ def index_doc(config, doc, **kw):
     except Exception, e:
         logger.error("Error while indexing to solr: %s" % str(e))
         raise
+
+def unindex_doc(config, doc):
+    """Unindex document in solr.
+    
+    ``config``
+        cone.mdb.solr.Config
+    ``doc``
+        cone.app.model.BaseNode deriving instance
+    """
+    url = 'http://%s:%s/%s/' % (config.server, config.port, config.path)
+    Solr(url).delete(q='uid:%s' % doc.metadata.uid)
