@@ -7,14 +7,6 @@ ul#mainmenu li.node-repositories a.current_page_item {
     background:url('images/menu_repositories_selected.png') top left no-repeat;
 }
 
-/* forms with box background */
-#form-repositoryform,
-#form-mediaform,
-#form-revisionform {
-    background:url('/static/images/box.gif') top left no-repeat;
-    padding:12px;
-}
-
 /* Revision */
 .revisiondetails {
     border-width:1px 1px 0px 1px;
