@@ -1,13 +1,8 @@
 import os
+from plumber import plumber
 from node.locking import locktree
 from node.ext.mdb import Repository
-from pyramid.security import (
-    authenticated_userid,
-    Everyone,
-    Allow,
-    Deny,
-    ALL_PERMISSIONS,
-)
+from pyramid.security import authenticated_userid
 from cone.app.model import (
     Properties,
     ProtectedProperties,
@@ -21,6 +16,7 @@ from cone.app.utils import instance_property
 from cone.mdb.solr import unindex_doc
 from cone.mdb.model.media import MediaAdapter
 from cone.mdb.model.utils import (
+    GroupToRepositoryACL,
     DBLocation,
     timestamp,
     solr_config,
@@ -70,18 +66,10 @@ def update_repository(request, repository, title, description):
 
 
 class RepositoryAdapter(AdapterNode, DBLocation):
+    __metaclass__ = plumber
+    __plumbing__ = GroupToRepositoryACL
     
     node_info_name = 'repository'
-    
-    @property
-    def __acl__(self):
-        return [
-            (Allow, 'group:%s' % self.name, ['view', 'add', 'edit']),
-            (Allow, 'role:owner', ['view', 'add', 'edit', 'delete']),
-            (Allow, 'role:manager', ['view', 'add', 'edit', 'delete', 'manage']),
-            (Allow, Everyone, ['login']),
-            (Deny, Everyone, ALL_PERMISSIONS),
-        ]
     
     @instance_property
     def properties(self):

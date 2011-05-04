@@ -215,7 +215,7 @@ Authenticate as unprivileged user and try again::
 
 'editor' user has 'edit' permission::
 
-    >>> layer.authenticate('editor')
+    >>> layer.authenticate('manager')
     >>> has_permission('edit', revision, request)
     <ACLAllowed instance at ...
     
@@ -249,6 +249,7 @@ Solr must be updated as well::
 
 Only 'manager' is allowed to perform a transition from 'frozen'::
 
+    >>> layer.authenticate('editor')
     >>> transitions = workflow.get_transitions(
     ...     revision, request, from_state=revision.state)
     >>> [tr['name'] for tr in transitions]

@@ -1,5 +1,6 @@
 import os
 import uuid
+from plumber import plumber
 from node.locking import locktree
 from node.ext.mdb import (
     Media,
@@ -19,6 +20,7 @@ from cone.app.utils import instance_property
 from cone.app.browser.utils import nodepath
 from cone.mdb.model.revision import RevisionAdapter
 from cone.mdb.model.utils import (
+    GroupToRepositoryACL,
     solr_config,
     timestamp,
 )
@@ -89,6 +91,8 @@ def update_media(request, media, title, description):
 
 
 class MediaAdapter(AdapterNode):
+    __metaclass__ = plumber
+    __plumbing__ = GroupToRepositoryACL
     
     node_info_name = 'media'
     

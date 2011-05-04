@@ -23,7 +23,7 @@ Unauthenticated renders login form::
 
 Authenticated view shows active revision::
 
-    >>> layer.authenticate('max')
+    >>> layer.authenticate('manager')
     >>> res = render_tile(media, request, 'content')
     >>> res.find('Active revision') > -1
     True
@@ -48,6 +48,7 @@ Add::
     
     >>> request.params['factory'] = 'media'
     >>> repository = media.__parent__
+    >>> layer.authenticate('viewer')
     >>> res = render_tile(repository, request, 'add')
     Traceback (most recent call last):
       ...

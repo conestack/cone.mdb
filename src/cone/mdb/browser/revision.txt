@@ -23,7 +23,7 @@ Unauthenticated renders login form::
 
 Authenticated::
 
-    >>> layer.authenticate('max')
+    >>> layer.authenticate('manager')
     >>> res = render_tile(revision, request, 'content')
     >>> res.find('Revision 99') > -1
     True
@@ -33,6 +33,7 @@ Add::
     >>> import cone.app.browser.referencebrowser
     >>> request.params['factory'] = 'revision'
     >>> media = revision.__parent__
+    >>> layer.authenticate('viewer')
     >>> res = render_tile(media, request, 'add')
     Traceback (most recent call last):
       ...
@@ -40,7 +41,7 @@ Add::
     <cone.app.browser.authoring.AddTile object at ...> 
     failed permission check
     
-    >>> layer.authenticate('editor')
+    >>> layer.authenticate('manager')
     >>> res = render_tile(media, request, 'add')
     >>> expected = '<form action="http://example.com/repositories/repo1/a/add"'
     >>> res.find(expected) > -1

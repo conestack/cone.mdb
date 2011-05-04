@@ -1,5 +1,6 @@
 import os
 import uuid
+from plumber import plumber
 from bda.basen import base62
 from pyramid.security import authenticated_userid
 from pyramid.threadlocal import get_current_request
@@ -19,6 +20,7 @@ from node.ext.mdb import (
 )
 from cone.app.browser.utils import nodepath
 from cone.mdb.model.utils import (
+    GroupToRepositoryACL,
     solr_config,
     timestamp,
 )
@@ -184,6 +186,8 @@ def update_revision(request, revision, data):
 
 
 class RevisionAdapter(AdapterNode):
+    __metaclass__ = plumber
+    __plumbing__ = GroupToRepositoryACL
     
     node_info_name = 'revision'
     
