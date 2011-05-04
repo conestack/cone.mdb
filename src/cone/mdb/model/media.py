@@ -10,7 +10,7 @@ from cone.app.model import (
     Properties,
     XMLProperties,
     AdapterNode,
-    BaseNodeInfo,
+    NodeInfo,
     registerNodeInfo,
 )
 from cone.app.browser.utils import nodepath
@@ -151,7 +151,7 @@ class MediaAdapter(AdapterNode):
         self.metadata()
 
 
-info = BaseNodeInfo()
+info = NodeInfo()
 info.title = 'Media'
 info.description = 'A media object.'
 info.node = MediaAdapter

@@ -6,7 +6,7 @@ from cone.app.model import (
     BaseNode,
     Properties,
     BaseMetadata,
-    BaseNodeInfo,
+    NodeInfo,
     registerNodeInfo,
 )
 from cone.mdb.solr import unindex_doc
@@ -84,7 +84,7 @@ class Repositories(BaseNode, DBLocation):
         del self._todelete
 
 
-info = BaseNodeInfo()
+info = NodeInfo()
 info.title = 'Repositories'
 info.description = 'Collection of repositories.'
 info.node = Repositories

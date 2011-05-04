@@ -7,7 +7,7 @@ from repoze.workflow import get_workflow
 from cone.app.model import (
     Properties,
     AdapterNode,
-    BaseNodeInfo,
+    NodeInfo,
     registerNodeInfo,
 )
 from node.ext.mdb import (
@@ -226,7 +226,7 @@ class RevisionAdapter(AdapterNode):
         self.model()
 
 
-info = BaseNodeInfo()
+info = NodeInfo()
 info.title = 'Revision'
 info.description = 'A revision.'
 info.node = RevisionAdapter

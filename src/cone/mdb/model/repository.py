@@ -6,7 +6,7 @@ from cone.app.model import (
     Properties,
     XMLProperties,
     AdapterNode,
-    BaseNodeInfo,
+    NodeInfo,
     registerNodeInfo,
 )
 from cone.mdb.solr import unindex_doc
@@ -121,7 +121,7 @@ class RepositoryAdapter(AdapterNode, DBLocation):
         self.metadata()
 
 
-info = BaseNodeInfo()
+info = NodeInfo()
 info.title = 'Repository'
 info.description = 'A repository.'
 info.node = RepositoryAdapter
