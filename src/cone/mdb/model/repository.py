@@ -1,7 +1,13 @@
 import os
 from node.locking import locktree
 from node.ext.mdb import Repository
-from pyramid.security import authenticated_userid
+from pyramid.security import (
+    authenticated_userid,
+    Everyone,
+    Allow,
+    Deny,
+    ALL_PERMISSIONS,
+)
 from cone.app.model import (
     Properties,
     ProtectedProperties,
@@ -66,6 +72,16 @@ def update_repository(request, repository, title, description):
 class RepositoryAdapter(AdapterNode, DBLocation):
     
     node_info_name = 'repository'
+    
+    @property
+    def __acl__(self):
+        return [
+            (Allow, 'group:%s' % self.name, ['view', 'add', 'edit']),
+            (Allow, 'role:owner', ['view', 'add', 'edit', 'delete']),
+            (Allow, 'role:manager', ['view', 'add', 'edit', 'delete', 'manage']),
+            (Allow, Everyone, ['login']),
+            (Deny, Everyone, ALL_PERMISSIONS),
+        ]
     
     @instance_property
     def properties(self):

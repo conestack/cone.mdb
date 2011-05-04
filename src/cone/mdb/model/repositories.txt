@@ -4,6 +4,7 @@ Repositories
 ::
 
     >>> from cone.app import root
+    >>> layer.authenticate('manager')
 
 Reporitories is a registered plugin on root::
 
@@ -55,3 +56,5 @@ Provided metadata::
     
     >>> repositories['repo2'] is repo
     True
+    
+    >>> layer.logout()

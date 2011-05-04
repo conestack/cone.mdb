@@ -55,7 +55,7 @@ Add::
     <cone.app.browser.authoring.AddTile object at ...> 
     failed permission check
     
-    >>> layer.authenticate('editor')
+    >>> layer.authenticate('manager')
     >>> res = render_tile(repository, request, 'add')
     >>> expected = '<form action="http://example.com/repositories/repo1/add"'
     >>> res.find(expected) > -1

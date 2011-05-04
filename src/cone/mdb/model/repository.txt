@@ -11,7 +11,7 @@ Repository
     
     >>> request = DummyRequest()
     
-    >>> layer.authenticate('max')
+    >>> layer.authenticate('manager')
     
     >>> add_repository(request,
     ...                repositories,
@@ -26,10 +26,6 @@ Repository
     
     >>> properties = repository.properties
     >>> properties.keys()
-    ['action_up', 'in_navtree']
-    
-    >>> layer.authenticate('owner')
-    >>> properties.keys()
     ['action_up', 'editable', 'in_navtree', 'deletable']
     
     >>> properties.editable
@@ -38,16 +34,6 @@ Repository
     >>> properties.deletable
     True
     
-    >>> properties.in_navtree
-    True
-    
-    >>> properties.action_up
-    True
-    
-    >>> layer.authenticate('max')
-    
-    >>> properties.editable
-    >>> properties.deletable
     >>> properties.in_navtree
     True
     
@@ -68,15 +54,12 @@ Repository
     u'Repository 3 description'
     
     >>> metadata.creator
-    u'max'
+    u'manager'
     
     >>> metadata.created
     datetime.datetime(...)
     
     >>> from cone.mdb.model import update_repository
-    
-    >>> layer.authenticate('sepp')
-    
     >>> update_repository(request, repository, u'New title', u'New description')
     
     >>> metadata.keys()
@@ -95,7 +78,7 @@ Repository
     True
     
     >>> metadata.modified_by
-    'sepp'
+    'manager'
     
     >>> layer.logout()
 

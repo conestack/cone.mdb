@@ -22,7 +22,7 @@ Unauthenticated renders login form::
 
 Authenticated view lists media of repository::
 
-    >>> layer.authenticate('max')
+    >>> layer.authenticate('manager')
     >>> res = render_tile(repository, request, 'content')
     >>> res.find('href="http://example.com/repositories/repo1/a"') > -1
     True
@@ -35,6 +35,7 @@ Authenticated view lists media of repository::
 
 Add::
 
+    >>> layer.authenticate('max')
     >>> request.params['factory'] = 'repository'
     >>> repositories = repository.__parent__
     >>> res = render_tile(repositories, request, 'add')
@@ -44,7 +45,7 @@ Add::
     <cone.app.browser.authoring.AddTile object at ...> 
     failed permission check
     
-    >>> layer.authenticate('editor')
+    >>> layer.authenticate('manager')
     >>> res = render_tile(repositories, request, 'add')
     >>> res.find('<form action="http://example.com/repositories/add"') > -1
     True

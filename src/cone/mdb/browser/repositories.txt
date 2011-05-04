@@ -21,7 +21,7 @@ Unauthenticated renders login form::
 
 Authenticated lists repositories::
 
-    >>> layer.authenticate('max')
+    >>> layer.authenticate('manager')
     >>> res = render_tile(repositories, request, 'content')
     >>> res.find('href="http://example.com/repositories/repo1"') > -1
     True
