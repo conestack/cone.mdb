@@ -26,6 +26,10 @@ Repository
     
     >>> properties = repository.properties
     >>> properties.keys()
+    ['action_up', 'in_navtree']
+    
+    >>> layer.authenticate('owner')
+    >>> properties.keys()
     ['action_up', 'editable', 'in_navtree', 'deletable']
     
     >>> properties.editable
@@ -34,6 +38,16 @@ Repository
     >>> properties.deletable
     True
     
+    >>> properties.in_navtree
+    True
+    
+    >>> properties.action_up
+    True
+    
+    >>> layer.authenticate('max')
+    
+    >>> properties.editable
+    >>> properties.deletable
     >>> properties.in_navtree
     True
     

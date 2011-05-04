@@ -4,11 +4,13 @@ from node.locking import locktree
 from node.ext.mdb import Repository
 from cone.app.model import (
     BaseNode,
-    Properties,
+    ProtectedProperties,
     BaseMetadata,
     NodeInfo,
     registerNodeInfo,
 )
+from cone.app.security import DEFAULT_NODE_PROPERTY_PERMISSIONS
+from cone.app.utils import instance_property
 from cone.mdb.solr import unindex_doc
 from cone.mdb.model.utils import (
     solr_config,
@@ -23,22 +25,18 @@ class Repositories(BaseNode, DBLocation):
     
     node_info_name = 'repositories'
     
-    @property
+    @instance_property('_properties')
     def properties(self):
-        if not hasattr(self, '_properties'):
-            props = Properties()
-            props.in_navtree = True
-            self._properties = props
-        return self._properties
+        props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
+        props.in_navtree = True
+        return props
     
-    @property
+    @instance_property('_metadata')
     def metadata(self):
-        if not hasattr(self, '_metadata'):
-            metadata = BaseMetadata()
-            metadata.title = "Repositories"
-            metadata.description = "Container for Repositories"
-            self._metadata = metadata
-        return self._metadata
+        metadata = BaseMetadata()
+        metadata.title = "Repositories"
+        metadata.description = "Container for Repositories"
+        return metadata
     
     def __iter__(self):
         path = self.dbpath

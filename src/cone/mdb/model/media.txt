@@ -36,6 +36,8 @@ Media
       ...
     KeyError: 'inexistent'
     
+    >>> layer.authenticate('owner')
+    
     >>> properties = media.properties
     >>> properties.keys()
     ['action_list', 'referencable', 'editable', 
@@ -58,6 +60,8 @@ Media
     
     >>> properties.action_up
     True
+    
+    >>> layer.authenticate('andi')
     
     >>> metadata = media.metadata
     >>> metadata

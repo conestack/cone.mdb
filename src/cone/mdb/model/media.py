@@ -8,11 +8,14 @@ from node.ext.mdb import (
 from pyramid.security import authenticated_userid
 from cone.app.model import (
     Properties,
+    ProtectedProperties,
     XMLProperties,
     AdapterNode,
     NodeInfo,
     registerNodeInfo,
 )
+from cone.app.security import DEFAULT_NODE_PROPERTY_PERMISSIONS
+from cone.app.utils import instance_property
 from cone.app.browser.utils import nodepath
 from cone.mdb.model.revision import RevisionAdapter
 from cone.mdb.model.utils import (
@@ -89,29 +92,24 @@ class MediaAdapter(AdapterNode):
     
     node_info_name = 'media'
     
-    @property
+    @instance_property('_properties')
     def properties(self):
-        if not hasattr(self, '_properties'):
-            props = Properties()
-            props.in_navtree = True
-            props.editable = True
-            props.deletable = True
-            props.referencable = True
-            props.action_up = True
-            props.action_view = True
-            props.action_list = True
-            self._properties = props
-        return self._properties
+        props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
+        props.in_navtree = True
+        props.editable = True
+        props.deletable = True
+        props.referencable = True
+        props.action_up = True
+        props.action_view = True
+        props.action_list = True
+        return props
     
-    @property
+    @instance_property('_metadata')
     def metadata(self):
-        if hasattr(self, '_metadata'):
-            return self._metadata
         if self.model.__name__ is not None:
             path = os.path.join(self.model.root.__name__,
                                 *self.model.mediapath + ['media.info'])
-            self._metadata = XMLProperties(path)
-            return self._metadata
+            return XMLProperties(path)
         return Properties()                                 #pragma NO COVERAGE
     
     @property

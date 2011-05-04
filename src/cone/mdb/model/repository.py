@@ -4,11 +4,14 @@ from node.ext.mdb import Repository
 from pyramid.security import authenticated_userid
 from cone.app.model import (
     Properties,
+    ProtectedProperties,
     XMLProperties,
     AdapterNode,
     NodeInfo,
     registerNodeInfo,
 )
+from cone.app.security import DEFAULT_NODE_PROPERTY_PERMISSIONS
+from cone.app.utils import instance_property
 from cone.mdb.solr import unindex_doc
 from cone.mdb.model.media import MediaAdapter
 from cone.mdb.model.utils import (
@@ -64,25 +67,20 @@ class RepositoryAdapter(AdapterNode, DBLocation):
     
     node_info_name = 'repository'
     
-    @property
+    @instance_property('_properties')
     def properties(self):
-        if not hasattr(self, '_properties'):
-            props = Properties()
-            props.in_navtree = True
-            props.editable = True
-            props.deletable = True
-            props.action_up = True
-            self._properties = props
-        return self._properties
+        props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
+        props.in_navtree = True
+        props.editable = True
+        props.deletable = True
+        props.action_up = True
+        return props
     
-    @property
+    @instance_property('_metadata')
     def metadata(self):
-        if hasattr(self, '_metadata'):
-            return self._metadata
         if self.model.__name__ is not None:
             path = os.path.join(self.model.__name__, 'database.info')
-            self._metadata = XMLProperties(path)
-            return self._metadata
+            return XMLProperties(path)
         return Properties()                                 #pragma NO COVERAGE
     
     def __getitem__(self, key):

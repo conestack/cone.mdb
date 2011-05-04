@@ -6,10 +6,12 @@ from pyramid.threadlocal import get_current_request
 from repoze.workflow import get_workflow
 from cone.app.model import (
     Properties,
+    ProtectedProperties,
     AdapterNode,
     NodeInfo,
     registerNodeInfo,
 )
+from cone.app.security import DEFAULT_NODE_PROPERTY_PERMISSIONS
 from node.ext.mdb import (
     Revision as MDBRevision,
     Metadata as MDBMetadata,
@@ -187,7 +189,7 @@ class RevisionAdapter(AdapterNode):
     
     @property
     def properties(self):
-        props = Properties()
+        props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
         props.in_navtree = True
         props.editable = self.state == u'working_copy'
         props.deletable = self.state == u'working_copy'

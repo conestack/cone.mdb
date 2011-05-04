@@ -131,6 +131,8 @@ Revision
     'description', 'revision', 'title', 'keywords', 'relations', 'alttag', 
     'visibility', 'uid']
     
+    >>> layer.authenticate('owner')
+    
     >>> revision.properties.keys()
     ['wf_name', 'editable', 'wf_transition_names', 'action_view', 
     'deletable', 'action_up', 'leaf', 'in_navtree', 'wf_state']
@@ -150,14 +152,16 @@ Revision
     >>> revision.properties.action_up
     True
     
+    >>> revision.properties.wf_state
+    True
+    
+    >>> layer.authenticate('andi')
+    
     >>> [key for key in revision]
     []
     
     >>> revision.properties.wf_name
     u'revision'
-    
-    >>> revision.properties.wf_state
-    True
     
     >>> layer.logout()
 
