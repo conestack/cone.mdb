@@ -92,7 +92,7 @@ class MediaAdapter(AdapterNode):
     
     node_info_name = 'media'
     
-    @instance_property('_properties')
+    @instance_property
     def properties(self):
         props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
         props.in_navtree = True
@@ -104,7 +104,7 @@ class MediaAdapter(AdapterNode):
         props.action_list = True
         return props
     
-    @instance_property('_metadata')
+    @instance_property
     def metadata(self):
         if self.model.__name__ is not None:
             path = os.path.join(self.model.root.__name__,

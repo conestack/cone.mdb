@@ -67,7 +67,7 @@ class RepositoryAdapter(AdapterNode, DBLocation):
     
     node_info_name = 'repository'
     
-    @instance_property('_properties')
+    @instance_property
     def properties(self):
         props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
         props.in_navtree = True
@@ -76,7 +76,7 @@ class RepositoryAdapter(AdapterNode, DBLocation):
         props.action_up = True
         return props
     
-    @instance_property('_metadata')
+    @instance_property
     def metadata(self):
         if self.model.__name__ is not None:
             path = os.path.join(self.model.__name__, 'database.info')

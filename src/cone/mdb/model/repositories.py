@@ -25,13 +25,13 @@ class Repositories(BaseNode, DBLocation):
     
     node_info_name = 'repositories'
     
-    @instance_property('_properties')
+    @instance_property
     def properties(self):
         props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
         props.in_navtree = True
         return props
     
-    @instance_property('_metadata')
+    @instance_property
     def metadata(self):
         metadata = BaseMetadata()
         metadata.title = "Repositories"
