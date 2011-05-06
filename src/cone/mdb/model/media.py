@@ -2,6 +2,7 @@ import os
 import uuid
 from plumber import plumber
 from node.locking import locktree
+from node.utils import instance_property
 from node.ext.mdb import (
     Media,
     MediaKeys,
@@ -16,7 +17,6 @@ from cone.app.model import (
     registerNodeInfo,
 )
 from cone.app.security import DEFAULT_NODE_PROPERTY_PERMISSIONS
-from cone.app.utils import instance_property
 from cone.app.browser.utils import nodepath
 from cone.mdb.model.revision import RevisionAdapter
 from cone.mdb.model.utils import (

@@ -1,6 +1,7 @@
 import os
 import shutil
 from node.locking import locktree
+from node.utils import instance_property
 from node.ext.mdb import Repository
 from cone.app.model import (
     BaseNode,
@@ -10,7 +11,6 @@ from cone.app.model import (
     registerNodeInfo,
 )
 from cone.app.security import DEFAULT_NODE_PROPERTY_PERMISSIONS
-from cone.app.utils import instance_property
 from cone.mdb.solr import unindex_doc
 from cone.mdb.model.utils import (
     solr_config,
