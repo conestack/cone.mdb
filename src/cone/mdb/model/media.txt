@@ -7,11 +7,10 @@ Media
     >>> repository = root['repositories']['repo1']
     
     >>> from cone.mdb.model import add_media
-    >>> from pyramid.testing import DummyRequest
     
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     
-    >>> layer.authenticate('andi')
+    >>> layer.login('max')
     
     >>> add_media(request,
     ...           repository,
@@ -36,7 +35,7 @@ Media
       ...
     KeyError: 'inexistent'
     
-    >>> layer.authenticate('owner')
+    >>> layer.login('owner')
     
     >>> properties = media.properties
     >>> properties.keys()
@@ -61,7 +60,7 @@ Media
     >>> properties.action_up
     True
     
-    >>> layer.authenticate('andi')
+    >>> layer.login('max')
     
     >>> metadata = media.metadata
     >>> metadata
@@ -80,14 +79,14 @@ Media
     'Media 3 description'
     
     >>> metadata.creator
-    'andi'
+    'max'
     
     >>> metadata.created
     datetime.datetime(...)
     
     >>> from cone.mdb.model import update_media
     
-    >>> layer.authenticate('anna')
+    >>> layer.login('sepp')
     
     >>> update_media(request, media, u'New title', u'New description')
     
@@ -108,6 +107,6 @@ Media
     True
     
     >>> metadata.modified_by
-    'anna'
+    'sepp'
     
     >>> layer.logout()

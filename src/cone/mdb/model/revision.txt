@@ -73,11 +73,10 @@ Revision
 ``add_revision``::
     
     >>> from cone.mdb.model import add_revision
-    >>> from pyramid.testing import DummyRequest
     
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     
-    >>> layer.authenticate('andi')
+    >>> layer.login('max')
     
     >>> media = root['repositories']['repo1']['a']
     >>> data = {
@@ -131,7 +130,7 @@ Revision
     'description', 'revision', 'title', 'keywords', 'relations', 'alttag', 
     'visibility', 'uid']
     
-    >>> layer.authenticate('owner')
+    >>> layer.login('owner')
     
     >>> revision.properties.keys()
     ['wf_name', 'editable', 'wf_transition_names', 'action_view', 
@@ -155,7 +154,7 @@ Revision
     >>> revision.properties.wf_state
     True
     
-    >>> layer.authenticate('andi')
+    >>> layer.login('max')
     
     >>> [key for key in revision]
     []
@@ -168,7 +167,7 @@ Revision
 Revision Workflow::
 
     >>> from cone.mdb.model import RevisionAdapter
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
 
 Lookup workflow::
 
@@ -200,7 +199,7 @@ We're anonymous, no transition::
 
 Authenticate as unprivileged user and try again::
 
-    >>> layer.authenticate('max')
+    >>> layer.login('max')
     >>> has_permission('edit', revision, request)
     <ACLDenied instance at ...
     
@@ -215,7 +214,7 @@ Authenticate as unprivileged user and try again::
 
 'editor' user has 'edit' permission::
 
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     >>> has_permission('edit', revision, request)
     <ACLAllowed instance at ...
     
@@ -249,7 +248,7 @@ Solr must be updated as well::
 
 Only 'manager' is allowed to perform a transition from 'frozen'::
 
-    >>> layer.authenticate('editor')
+    >>> layer.login('editor')
     >>> transitions = workflow.get_transitions(
     ...     revision, request, from_state=revision.state)
     >>> [tr['name'] for tr in transitions]
@@ -264,7 +263,7 @@ Only 'manager' is allowed to perform a transition from 'frozen'::
     WorkflowError: manage permission required for transition 
     using 'frozen_2_working_copy'
     
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     >>> revision.state
     u'frozen'
     

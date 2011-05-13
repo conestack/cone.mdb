@@ -3,7 +3,6 @@ import shutil
 import datetime
 import pyramid_zcml
 from plone.testing import Layer
-from pyramid.testing import DummyRequest
 from cone.app import root
 from cone.app.testing import security
 from cone.mdb.model import (
@@ -20,7 +19,7 @@ class Database(Layer):
     defaultBases = (security,)
     
     def _add_repositories(self):
-        request = DummyRequest()
+        request = self.current_request
         repositories = root['repositories']
         for i in range(1, 3):
             add_repository(
@@ -31,7 +30,7 @@ class Database(Layer):
                 'Repository %i description' % i)
     
     def _add_media(self):
-        request = DummyRequest()
+        request = self.current_request
         repository = root['repositories']['repo1']
         for i in range(1, 3):
             add_media(
@@ -41,7 +40,7 @@ class Database(Layer):
                 'Media %i description' % i)
     
     def _add_revisions(self):
-        request = DummyRequest()
+        request = self.current_request
         media = root['repositories']['repo1']['a']
         for i in range(2):
             data = {
@@ -66,7 +65,8 @@ class Database(Layer):
         self.orgin_db_path = self.db.attrs.path
         self.db.attrs.path = self.tempdir
         self.db()
-        self.authenticate('manager')
+        self.new_request()
+        self.login('manager')
         self._add_repositories()
         self._add_media()
         self._add_revisions()
@@ -86,8 +86,21 @@ class Database(Layer):
         self.db.attrs.path = self.tempdir
         self.db()
     
-    def authenticate(self, login):
-        security.authenticate(login)
+    # XXX: better way of providing stuff from base layer below
+    
+    @property
+    def security(self):
+        return security
+    
+    def login(self, login):
+        security.login(login)
     
     def logout(self):
         security.logout()
+    
+    def new_request(self):
+        return security.new_request()
+    
+    @property
+    def current_request(self):
+        return security.current_request

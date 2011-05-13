@@ -7,11 +7,10 @@ Repository
     >>> repositories = root['repositories']
     
     >>> from cone.mdb.model import add_repository
-    >>> from pyramid.testing import DummyRequest
     
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     
     >>> add_repository(request,
     ...                repositories,

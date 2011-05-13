@@ -5,13 +5,12 @@ Revision
 
     >>> from cone.app import root
     >>> from cone.tile import render_tile
-    >>> from pyramid.testing import DummyRequest
     
     >>> import cone.app.browser.login
     >>> import cone.app.browser.contents
     >>> import cone.mdb.browser.revision
     >>> revision = root['repositories']['repo1']['a']['0']
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
 
 Unauthenticated renders login form::
 
@@ -23,7 +22,7 @@ Unauthenticated renders login form::
 
 Authenticated::
 
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     >>> res = render_tile(revision, request, 'content')
     >>> res.find('Revision 99') > -1
     True
@@ -33,7 +32,7 @@ Add::
     >>> import cone.app.browser.referencebrowser
     >>> request.params['factory'] = 'revision'
     >>> media = revision.__parent__
-    >>> layer.authenticate('viewer')
+    >>> layer.login('viewer')
     >>> res = render_tile(media, request, 'add')
     Traceback (most recent call last):
       ...
@@ -41,7 +40,7 @@ Add::
     <cone.app.browser.authoring.AddTile object at ...> 
     failed permission check
     
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     >>> res = render_tile(media, request, 'add')
     >>> expected = '<form action="http://example.com/repositories/repo1/a/add"'
     >>> res.find(expected) > -1
@@ -73,7 +72,7 @@ Add::
     u''
     
     >>> revision = media['3']
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     >>> res = render_tile(revision, request, 'content')
     >>> res.find('Revision title') > -1
     True
@@ -108,7 +107,7 @@ Add::
 Edit::
 
     >>> from datetime import datetime
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     >>> request.params['revisionform.visibility'] = 'anonymous'
     >>> request.params['revisionform.title'] = 'Other revision title'
     >>> request.params['revisionform.author'] = 'sepp'
@@ -156,7 +155,7 @@ Edit::
 
 Revision details now displays relations::
 
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     >>> res = render_tile(revision, request, 'content')
     >>> res.find('ajax:target="http://example.com/repositories/repo1/a/2"') > -1
     True

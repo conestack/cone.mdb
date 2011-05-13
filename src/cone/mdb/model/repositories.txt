@@ -4,7 +4,7 @@ Repositories
 ::
 
     >>> from cone.app import root
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
 
 Reporitories is a registered plugin on root::
 

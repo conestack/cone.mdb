@@ -23,7 +23,7 @@ TESTFILES = [
     'model/media.txt',
     'model/revision.txt',
     'model/utils.txt',
-    'browser/amqp.txt',
+#    'browser/amqp.txt',
     'browser/database.txt',
     'browser/solr.txt',
     'browser/livesearch.txt',

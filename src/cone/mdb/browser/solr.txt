@@ -5,13 +5,12 @@ Check ACL::
 
     >>> import cone.mdb.browser.solr
     >>> from cone.tile import render_tile
-    >>> from pyramid.testing import DummyRequest
     >>> from cone.app import root
     >>> solr = root['settings']['solr']
 
 Anonymous unauthorized::
 
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     >>> res = render_tile(solr, request, 'editform')
     Traceback (most recent call last):
       ...
@@ -21,7 +20,7 @@ Anonymous unauthorized::
 
 Unprivileged unauthorized::
 
-    >>> layer.authenticate('max')
+    >>> layer.login('max')
     >>> res = render_tile(solr, request, 'editform')
     Traceback (most recent call last):
       ...
@@ -31,7 +30,7 @@ Unprivileged unauthorized::
 
 Manager is allowed to edit settings::
 
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     
     >>> res = render_tile(solr, request, 'editform')
     >>> res.find('action="http://example.com/settings/solr/edit"') > 0

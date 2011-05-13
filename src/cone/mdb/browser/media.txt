@@ -5,13 +5,12 @@ Media
 
     >>> from cone.app import root
     >>> from cone.tile import render_tile
-    >>> from pyramid.testing import DummyRequest
     
     >>> import cone.app.browser.login
     >>> import cone.app.browser.contents
     >>> import cone.mdb.browser.media
     >>> media = root['repositories']['repo1']['a']
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
 
 Unauthenticated renders login form::
 
@@ -23,7 +22,7 @@ Unauthenticated renders login form::
 
 Authenticated view shows active revision::
 
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     >>> res = render_tile(media, request, 'content')
     >>> res.find('Active revision') > -1
     True
@@ -48,7 +47,7 @@ Add::
     
     >>> request.params['factory'] = 'media'
     >>> repository = media.__parent__
-    >>> layer.authenticate('viewer')
+    >>> layer.login('viewer')
     >>> res = render_tile(repository, request, 'add')
     Traceback (most recent call last):
       ...
@@ -56,7 +55,7 @@ Add::
     <cone.app.browser.authoring.AddTile object at ...> 
     failed permission check
     
-    >>> layer.authenticate('manager')
+    >>> layer.login('manager')
     >>> res = render_tile(repository, request, 'add')
     >>> expected = '<form action="http://example.com/repositories/repo1/add"'
     >>> res.find(expected) > -1
@@ -90,7 +89,7 @@ Add::
 
 Edit::
 
-    >>> request = DummyRequest()
+    >>> request = layer.new_request()
     >>> res = render_tile(media, request, 'edit')
     >>> expected = '<form action="http://example.com/repositories/repo1/d/edit"'
     >>> res.find(expected) > -1
