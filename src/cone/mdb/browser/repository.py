@@ -1,16 +1,18 @@
+import os
 import re
 from plumber import plumber
 from yafowil.base import (
-    factory,
     ExtractionError,
 )
 from cone.tile import (
     tile,
     registerTile,
 )
-from cone.app.browser.utils import make_url
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import Form
+from cone.app.browser.form import (
+    Form,
+    YAMLForm,
+)
 from cone.app.browser.authoring import (
     AddPart,
     EditPart,
@@ -31,60 +33,14 @@ registerTile('content',
 
 
 class RepositoryForm(object):
+    __metaclass__ = plumber
+    __plumbing__ = YAMLForm
     
-    def prepare(self):
-        resource = self.action_resource
-        action = make_url(self.request, node=self.model, resource=resource)
-        form = factory(
-            u'form',
-            name = 'repositoryform',
-            props = {
-                'action': action,
-            })
-        if resource == 'add':
-            form['id'] = factory(
-                'field:label:*valid_id:error:text',
-                props = {
-                    'required': 'No repository id given',
-                    'label': 'Repository id',
-                },
-                custom = {
-                    'valid_id': ([self.valid_id], [], [], []),
-                })
-        form['title'] = factory(
-            'field:label:error:text',
-            value = self.model.metadata.title,
-            props = {
-                'required': 'No repository title given',
-                'label': 'Repository title',
-            })
-        form['description'] = factory(
-            'field:label:error:richtext',
-            value = self.model.metadata.description,
-            props = {
-                'label': 'Repository description',
-                'rows': 5,
-            })
-        form['save'] = factory(
-            'submit',
-            props = {
-                'action': 'save',
-                'expression': True,
-                'handler': self.save,
-                'next': self.next,
-                'label': 'Save',
-            })
-        form['cancel'] = factory(
-            'submit',
-            props = {
-                'action': 'cancel',
-                'expression': True,
-                'handler': None,
-                'next': self.next,
-                'label': 'Cancel',
-                'skip': True,
-            })
-        self.form = form
+    form_template_path = os.path.join(os.path.dirname(__file__),
+                                      'forms/repository.yaml')
+    
+    def id_mode(self, widget, data):
+        return self.action_resource == 'add' and 'edit' or None
     
     def valid_id(self, widget, data):
         id = self.request.params.get('repositoryform.id')
@@ -108,6 +64,7 @@ class RepositoryAddForm(RepositoryForm, Form):
             data.fetch('repositoryform.id').extracted,
             data.fetch('repositoryform.title').extracted,
             data.fetch('repositoryform.description').extracted)
+
 
 @tile('editform', interface=RepositoryAdapter, permission="edit")
 class RepositoryEditForm(RepositoryForm, Form):

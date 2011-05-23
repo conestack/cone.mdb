@@ -1,0 +1,45 @@
+factory: form
+name: repositoryform
+props:
+    action: context.form_action
+    class: ajax
+widgets:
+- id:
+    factory: "mode:field:label:*valid_id:error:text"
+    props:
+        label: Repository id
+        required: No repository id given
+        mode: context.id_mode
+    custom:
+        valid_id:
+            extractors:
+                - context.valid_id
+- title:
+    factory: field:label:error:text
+    value: expr:context.model.metadata.title
+    props:
+        label: Repository title
+        required: No repository title given
+- description:
+    factory: field:label:error:richtext
+    value: expr:context.model.metadata.description
+    props:
+        label: Repository description
+        rows: 5
+- save:
+    factory: submit
+    props:
+        action: save
+        expression: True
+        handler: context.save
+        next: context.next
+        label: Save
+- cancel:
+    factory: submit
+    props:
+        action: cancel
+        expression: True
+        handler: None
+        next: context.next
+        label: Cancel
+        skip: True
