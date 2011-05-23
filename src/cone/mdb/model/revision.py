@@ -2,6 +2,10 @@ import os
 import uuid
 from plumber import plumber
 from bda.basen import base62
+from hurry.filesize import (
+    size,
+    alternative,
+)
 from pyramid.security import authenticated_userid
 from pyramid.threadlocal import get_current_request
 from repoze.workflow import get_workflow
@@ -151,9 +155,9 @@ def add_revision(request, media, data):
     metadata.suid = str(base62(int(uid)))
     metadata.created = timestamp()
     metadata.creator = authenticated_userid(request)
-    
     set_binary(revision, data)
     set_metadata(metadata, data)
+    metadata.size = size(len(revision['binary'].payload), system=alternative)
     
     revision_adapter = media[revision.__name__]
     wf_name = revision_adapter.properties.wf_name
@@ -170,7 +174,7 @@ def update_revision(request, revision, data):
     
     ``request``
         webob request
-    ``media``
+    ``revision``
         cone.mdb.model.Revision
     ``data``
         revision data
@@ -180,7 +184,8 @@ def update_revision(request, revision, data):
         metadata.creator = authenticated_userid(request)
     set_binary(revision.model, data)
     set_metadata(metadata, data)
-    
+    metadata.size = size(len(revision.model['binary'].payload),
+                         system=alternative)
     revision()
     index_revision(revision)
 

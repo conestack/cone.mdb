@@ -35,6 +35,7 @@ setup(name='cone.mdb',
           'node.ext.ugm',
           'zamqp',
           'bda.basen',
+          'hurry.filesize',
       ],
       extras_require = dict(
           test=[

@@ -77,6 +77,10 @@
         <td class="labelcol">Alttag</td>
         <td tal:content="metadata.alttag">Foo</td>
       </tr>
+      <tr>
+        <td class="labelcol">File Size</td>
+        <td tal:content="metadata.size">0 Kb</td>
+      </tr>
     </table>
   </div>
 </tal:ajax>

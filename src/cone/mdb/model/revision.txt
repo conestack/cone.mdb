@@ -126,9 +126,9 @@ Revision
     'Revision 99'
     
     >>> revision.metadata.keys()
-    ['author', 'created', 'state', 'creator', 'expires', 'effective', 'suid', 
-    'description', 'revision', 'title', 'keywords', 'relations', 'alttag', 
-    'visibility', 'uid']
+    ['author', 'created', 'state', 'creator', 'expires', 'effective', 'size', 
+    'suid', 'description', 'revision', 'title', 'keywords', 'relations', 
+    'alttag', 'visibility', 'uid']
     
     >>> layer.login('owner')
     
