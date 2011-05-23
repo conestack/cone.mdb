@@ -1,0 +1,35 @@
+factory: form
+name: mediaform
+props:
+    action: context.form_action
+    class: ajax
+widgets:
+- title:
+    factory: field:label:error:text
+    value: expr:context.model.metadata.title
+    props:
+        label: Media title
+        required: No media title given
+- description:
+    factory: field:label:error:textarea
+    value: expr:context.model.metadata.description
+    props:
+        label: Media description
+        rows: 5
+- save:
+    factory: submit
+    props:
+        action: save
+        expression: True
+        handler: context.save
+        next: context.next
+        label: Save
+- cancel:
+    factory: submit
+    props:
+        action: cancel
+        expression: True
+        handler: None
+        next: context.next
+        label: Cancel
+        skip: True

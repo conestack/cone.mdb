@@ -1,12 +1,14 @@
+import os
 from plumber import plumber
-from yafowil.base import factory
 from cone.tile import (
     tile,
     render_tile,
 )
-from cone.app.browser.utils import make_url
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import Form
+from cone.app.browser.form import (
+    Form,
+    YAMLForm,
+)
 from cone.app.browser.authoring import (
     AddPart,
     EditPart,
@@ -34,50 +36,11 @@ class MediaTile(ProtectedContentTile):
 
 
 class MediaForm(object):
+    __metaclass__ = plumber
+    __plumbing__ = YAMLForm
     
-    def prepare(self):
-        resource = self.action_resource
-        action = make_url(self.request, node=self.model, resource=resource)
-        form = factory(
-            u'form',
-            name = 'mediaform',
-            props = {
-                'action': action,
-            })
-        form['title'] = factory(
-            'field:label:error:text',
-            value = self.model.metadata.title,
-            props = {
-                'required': 'No media title given',
-                'label': 'Media title',
-            })
-        form['description'] = factory(
-            'field:label:error:textarea',
-            value = self.model.metadata.description,
-            props = {
-                'label': 'Media description',
-                'rows': 5,
-            })
-        form['save'] = factory(
-            'submit',
-            props = {
-                'action': 'save',
-                'expression': True,
-                'handler': self.save,
-                'next': self.next,
-                'label': 'Save',
-            })
-        form['cancel'] = factory(
-            'submit',
-            props = {
-                'action': 'cancel',
-                'expression': True,
-                'handler': None,
-                'next': self.next,
-                'label': 'Cancel',
-                'skip': True,
-            })
-        self.form = form
+    form_template_path = os.path.join(os.path.dirname(__file__),
+                                      'forms/media.yaml')
 
 
 @tile('addform', interface=MediaAdapter, permission="add")
