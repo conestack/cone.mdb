@@ -1,0 +1,95 @@
+factory: form
+name: revisionform
+props:
+    action: context.form_action
+    class: ajax
+widgets:
+- visibility:
+    factory: field:label:error:select
+    value: expr:context.model.metadata.visibility
+    props:
+        label: Visibility
+        vocabulary: context.visibility_vocab
+- title:
+    factory: field:label:error:text
+    value: expr:context.model.metadata.title
+    props:
+        label: Revision title
+        required: No revision title given
+- author:
+    factory: field:label:text
+    value: expr:context.model.metadata.author
+    props:
+        label: Document author
+- description:
+    factory: field:label:error:textarea
+    value: expr:context.model.metadata.description
+    props:
+        label: Revision description
+        rows: 5
+- keywords:
+    factory: "field:label:*keywords:textarea"
+    value: context.keywords_value
+    props:
+        label: Keywords
+        rows: 5
+    custom:
+        keywords:
+            extractors:
+                - context.keywords_extractor
+- relations:
+    factory: "field:label:*relations:reference"
+    value: context.relations_value
+    props:
+        label: Relations
+        multivalued: True
+        target: context.relations_target
+        vocabulary: context.relations_vocab
+    custom:
+        relations:
+            extractors:
+                - context.relations_extractor
+- effective:
+    factory: field:label:error:datetime
+    value: expr:context.model.metadata.effective
+    props:
+        label: Effective date
+        datepicker: True
+        time: True
+        locale: de
+- expires:
+    factory: field:label:error:datetime
+    value: expr:context.model.metadata.expires
+    props:
+        label: Expiration date
+        datepicker: True
+        time: True
+        locale: de
+- alttag:
+    factory: field:label:text
+    value: expr:context.model.metadata.alttag
+    props:
+        label: Alt Tag for publishing
+- data:
+    factory: field:label:error:file
+    value: context.data_value
+    props:
+        label: Data
+        required: No file uploaded
+- save:
+    factory: submit
+    props:
+        action: save
+        expression: True
+        handler: context.save
+        next: context.next
+        label: Save
+- cancel:
+    factory: submit
+    props:
+        action: cancel
+        expression: True
+        handler: None
+        next: context.next
+        label: Cancel
+        skip: True

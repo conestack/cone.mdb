@@ -1,13 +1,11 @@
+import os
 import datetime
 from webob import Response
 from plumber import plumber
 from zope.component import queryUtility
 from pyramid.interfaces import IResponseFactory
 from pyramid.view import view_config
-from yafowil.base import (
-    factory,
-    UNSET,
-)
+from yafowil.base import UNSET
 from cone.tile import (
     tile,
     registerTile,
@@ -15,7 +13,10 @@ from cone.tile import (
 )
 from cone.app.browser.utils import make_url
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import Form
+from cone.app.browser.form import (
+    Form,
+    YAMLForm,
+)
 from cone.app.browser.authoring import (
     AddPart,
     EditPart,
@@ -74,124 +75,12 @@ def download(model, request):
 
 
 class RevisionForm(object):
+    __metaclass__ = plumber
+    __plumbing__ = YAMLForm
     
-    form_name = 'revisionform'
+    form_template_path = os.path.join(os.path.dirname(__file__),
+                                      'forms/revision.yaml')
     
-    def prepare(self):
-        metadata = self.model.metadata
-        resource = self.action_resource
-        action = make_url(self.request, node=self.model, resource=resource)
-        form = factory(
-            u'form',
-            name = self.form_name,
-            props = {
-                'action': action,
-            })
-        form['visibility'] = factory(
-            'field:label:error:select',
-            value = metadata.visibility,
-            props = {
-                'label': 'Visibility',
-                'vocabulary': self.visibility_vocab,
-            })
-        form['title'] = factory(
-            'field:label:error:text',
-            value = metadata.title,
-            props = {
-                'required': 'No revision title given',
-                'label': 'Revision title',
-            })
-        form['author'] = factory(
-            'field:label:text',
-            value = metadata.author,
-            props = {
-                'label': 'Document author',
-            })
-        form['description'] = factory(
-            'field:label:error:textarea',
-            value = metadata.description,
-            props = {
-                'label': 'Revision description',
-                'rows': 5,
-            })
-        form['keywords'] = factory(
-            'field:label:*keywords:textarea',
-            value = self.keywords_value,
-            props = {
-                'label': 'Keywords',
-                'rows': 5,
-            },
-            custom = {
-                'keywords': ([self.keywords_extractor], [], [], []),
-            })
-        relations_target = make_url(
-            self.request, node=self.model.root['repositories'])
-        form['relations'] = factory(
-            'field:label:*relations:reference',
-            value = self.relations_value,
-            props = {
-                'label': 'Relations',
-                'multivalued': True,
-                'target': relations_target,
-                'vocabulary': self.relations_vocab,
-            },
-            custom = {
-                'relations': ([self.relations_extractor], [], [], []),
-            })
-        form['effective'] = factory(
-            'field:label:error:datetime',
-            value = metadata.effective,
-            props = {
-                'label': 'Effective date',
-                'datepicker': True,
-                'time': True,
-                'locale': 'de',
-            })
-        form['expires'] = factory(
-            'field:label:error:datetime',
-            value = metadata.expires,
-            props = {
-                'label': 'Expiration date',
-                'datepicker': True,
-                'time': True,
-                'locale': 'de',
-            })
-        form['alttag'] = factory(
-            'field:label:text',
-            value = metadata.alttag,
-            props = {
-                'label': 'Alt Tag for publishing',
-            })
-        # XXX: rename to file somewhen
-        form['data'] = factory(
-            'field:label:error:file',
-            value = self.data_value,
-            props = {
-                'label': 'Data',
-                'required': 'No file uploaded',
-            })
-        form['save'] = factory(
-            'submit',
-            props = {
-                'action': 'save',
-                'expression': True,
-                'handler': self.save,
-                'next': self.next,
-                'label': 'Save',
-            })
-        form['cancel'] = factory(
-            'submit',
-            props = {
-                'action': 'cancel',
-                'expression': True,
-                'handler': None,
-                'next': self.next,
-                'label': 'Cancel',
-                'skip': True,
-            })
-        self.form = form
-    
-    @property
     def visibility_vocab(self):
         if self.model.state == u'active':
             return [('anonymous', 'Anonymous')]
@@ -200,7 +89,6 @@ class RevisionForm(object):
             ('anonymous', 'Anonymous'),
         ]
     
-    @property
     def relations_vocab(self):
         """XXX: move relations lookup
         """
@@ -219,20 +107,20 @@ class RevisionForm(object):
             vocab.append((relation, title))
         return vocab
     
-    @property
-    def relations_value(self):
-        relations = self.relations_vocab
+    def relations_value(self, widget, data):
+        relations = self.relations_vocab()
         return [rel[0] for rel in relations]
     
-    @property
-    def keywords_value(self):
+    def relations_target(self, widget, data):
+        return make_url(self.request, node=self.model.root['repositories'])
+    
+    def keywords_value(self, widget, data):
         keywords = self.model.metadata.keywords
         if not keywords:
             keywords = list()
         return u'\n'.join(keywords)
     
-    @property
-    def data_value(self):
+    def data_value(self, widget, data):
         payload = None
         if self.model.__name__ is not None:
             payload = self.model.model['binary'].payload
@@ -253,7 +141,7 @@ class RevisionForm(object):
         return [rel for rel in relations if rel]
     
     def _field_id(self, s):
-        return u'%s.%s' % (self.form_name, s)
+        return u'revisionform.%s' % s
     
     def _fetch(self, data, name):
         return data.fetch(self._field_id(name)).extracted

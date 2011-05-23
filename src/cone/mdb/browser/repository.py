@@ -1,9 +1,7 @@
 import os
 import re
 from plumber import plumber
-from yafowil.base import (
-    ExtractionError,
-)
+from yafowil.base import ExtractionError
 from cone.tile import (
     tile,
     registerTile,
