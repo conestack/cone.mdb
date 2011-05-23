@@ -22,6 +22,7 @@ ul#mainmenu li.node-repositories a.current_page_item {
 .revisiondetails td.labelcol {
     font-weight:bold;
     text-align:right;
+    vertical-align:top;
     border-right:#ccc 1px solid;
 }
 .revisiondetails td ul {
