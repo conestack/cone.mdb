@@ -111,7 +111,7 @@ class RevisionForm(object):
         relations = self.relations_vocab()
         return [rel[0] for rel in relations]
     
-    def relations_target(self, widget, data):
+    def relations_target(self):
         return make_url(self.request, node=self.model.root['repositories'])
     
     def keywords_value(self, widget, data):
