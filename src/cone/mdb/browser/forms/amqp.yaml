@@ -1,0 +1,62 @@
+factory: form
+name: amqpform
+props:
+    action: context.form_action
+    class: ajax
+widgets:
+- host:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.host
+    props:
+        label: Host
+        required: No host given
+- user:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.user
+    props:
+        label: User
+        required: No user given
+- password:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.password
+    props:
+        label: Password
+        required: No password given
+- ssl:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.ssl
+    props:
+        label: SSL
+        required: Either True or False
+- exchange:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.exchange
+    props:
+        label: Exchange
+        required: No exchange given
+- queue:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.queue
+    props:
+        label: Queue
+        required: No queue given
+- type:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.type
+    props:
+        label: Type
+        required: No type given
+- realm:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.realm
+    props:
+        label: Realm
+        required: No realm given
+- save:
+    factory: submit
+    props:
+        action: save
+        expression: True
+        handler: context.save
+        next: context.next
+        label: Save

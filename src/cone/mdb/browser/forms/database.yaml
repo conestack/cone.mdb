@@ -1,0 +1,20 @@
+factory: form
+name: databaseform
+props:
+    action: context.form_action
+    class: ajax
+widgets:
+- path:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.path
+    props:
+        label: Database directory path
+        required: No path given
+- save:
+    factory: submit
+    props:
+        action: save
+        expression: True
+        handler: context.save
+        next: context.next
+        label: Save

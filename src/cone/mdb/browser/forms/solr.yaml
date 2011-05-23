@@ -1,0 +1,32 @@
+factory: form
+name: solrform
+props:
+    action: context.form_action
+    class: ajax
+widgets:
+- server:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.server
+    props:
+        label: Server
+        required: No server given
+- port:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.port
+    props:
+        label: Port
+        required: No port given
+- basepath:
+    factory: field:label:error:text
+    value: expr:context.model.attrs.basepath
+    props:
+        label: Basepath
+        required: No basepath given
+- save:
+    factory: submit
+    props:
+        action: save
+        expression: True
+        handler: context.save
+        next: context.next
+        label: Save

@@ -1,6 +1,6 @@
+import os
 from plumber import plumber
 from pysolr import Solr as PySolr
-from yafowil.base import factory
 from cone.tile import (
     Tile,
     tile,
@@ -10,7 +10,10 @@ from cone.mdb.model import Solr
 from cone.mdb.model.media import index_media
 from cone.mdb.model.revision import index_revision
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import Form
+from cone.app.browser.form import (
+    Form,
+    YAMLForm,
+)
 from cone.app.browser.settings import SettingsPart
 from cone.app.browser.utils import make_url
 from cone.app.browser.ajax import (
@@ -54,48 +57,11 @@ class Rebuild(Tile):
 @tile('editform', interface=Solr, permission="manage")
 class SolrSettingsForm(Form):
     __metaclass__ = plumber
-    __plumbing__ = SettingsPart
+    __plumbing__ = SettingsPart, YAMLForm
     
-    def prepare(self):
-        action = make_url(self.request, node=self.model, resource='edit')
-        form = factory(
-            u'form',
-            name='solrform',
-            props={
-                'action': action,
-                'class': 'ajax',
-            })
-        form['server'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.server,
-            props = {
-                'required': 'No server given',
-                'label': 'Server',
-            })
-        form['port'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.port,
-            props = {
-                'required': 'No port given',
-                'label': 'Port',
-            })
-        form['basepath'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.basepath,
-            props = {
-                'required': 'No basepath given',
-                'label': 'Basepath',
-            })
-        form['save'] = factory(
-            'submit',
-            props = {
-                'action': 'save',
-                'expression': True,
-                'handler': self.save,
-                'next': self.next,
-                'label': 'Save',
-            })
-        self.form = form
+    action_resource = u'edit'
+    form_template_path = os.path.join(os.path.dirname(__file__),
+                                      'forms/solr.yaml')
     
     def save(self, widget, data):
         self.model.attrs.server = data.fetch('solrform.server').extracted

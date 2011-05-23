@@ -1,13 +1,15 @@
+import os
 from plumber import plumber
-from yafowil.base import factory
 from cone.tile import (
     tile,
     registerTile,
 )
 from cone.app.browser.layout import ProtectedContentTile
-from cone.app.browser.form import Form
+from cone.app.browser.form import (
+    Form,
+    YAMLForm,
+)
 from cone.app.browser.settings import SettingsPart
-from cone.app.browser.utils import make_url
 from cone.mdb.model import Amqp
 
 
@@ -21,82 +23,11 @@ registerTile('content',
 @tile('editform', interface=Amqp, permission="manage")
 class AmqpSettingsForm(Form):
     __metaclass__ = plumber
-    __plumbing__ = SettingsPart
+    __plumbing__ = SettingsPart, YAMLForm
     
-    def prepare(self):
-        action = make_url(self.request, node=self.model, resource='edit')
-        form = factory(
-            u'form',
-            name='amqpform',
-            props={
-                'action': action,
-            })
-        form['host'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.host,
-            props = {
-                'required': 'No host given',
-                'label': 'Host',
-            })
-        form['user'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.user,
-            props = {
-                'required': 'No user given',
-                'label': 'User',
-            })
-        form['password'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.password,
-            props = {
-                'required': 'No password given',
-                'label': 'Password',
-            })
-        form['ssl'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.ssl,
-            props = {
-                'required': 'Either True or False',
-                'label': 'SSL',
-            })
-        form['exchange'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.exchange,
-            props = {
-                'required': 'No exchange given',
-                'label': 'Exchange',
-            })
-        form['queue'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.queue,
-            props = {
-                'required': 'No queue given',
-                'label': 'Queue',
-            })
-        form['type'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.type,
-            props = {
-                'required': 'No type given',
-                'label': 'Type',
-            })
-        form['realm'] = factory(
-            'field:label:error:text',
-            value = self.model.attrs.realm,
-            props = {
-                'required': 'No realm given',
-                'label': 'Realm',
-            })
-        form['save'] = factory(
-            'submit',
-            props = {
-                'action': 'save',
-                'expression': True,
-                'handler': self.save,
-                'next': self.next,
-                'label': 'Save',
-            })
-        self.form = form
+    action_resource = u'edit'
+    form_template_path = os.path.join(os.path.dirname(__file__),
+                                      'forms/amqp.yaml')
     
     def save(self, widget, data):
         def id(name):
