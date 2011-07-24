@@ -84,7 +84,7 @@
       <tr tal:condition="metadata.mimetype and metadata.mimetype.startswith('image')">
         <td class="labelcol">Image preview</td>
         <td>
-          <img src="${context.nodeurl}/download" alt="preview" width="500" />
+          <img src="${context.nodeurl}/download" alt="preview" width="300" />
         </td>
       </tr>
     </table>
