@@ -68,7 +68,8 @@ Revision
     >>> index_revision(RevisionAdapter(revision, 'bar', root))
     Traceback (most recent call last):
       ...
-    SolrError: [Reason: Document [null] missing required field: uid]
+    SolrError: [Reason: None]
+    ...Error 400 Document [null] missing required field: uid...
 
 ``add_revision``::
     

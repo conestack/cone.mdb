@@ -32,12 +32,12 @@ Provided metadata::
 
 ``keys``::
 
-    >>> repositories.keys()
+    >>> sorted(repositories.keys())
     ['repo1', 'repo2']
 
 ``__iter__``::
 
-    >>> [key for key in repositories]
+    >>> sorted([key for key in repositories])
     ['repo1', 'repo2']
 
 ``__getitem__``::

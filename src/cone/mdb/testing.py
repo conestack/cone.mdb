@@ -2,9 +2,8 @@ import tempfile
 import shutil
 import datetime
 import pyramid_zcml
-from plone.testing import Layer
 from cone.app import root
-from cone.app.testing import security
+from cone.app.testing import Security
 from cone.mdb.model import (
     add_repository,
     add_media,
@@ -12,11 +11,9 @@ from cone.mdb.model import (
 )
 
 
-class Database(Layer):
+class MDBLayer(Security):
     """Test layer providing dummy repositories
     """
-    
-    defaultBases = (security,)
     
     def _add_repositories(self):
         request = self.current_request
@@ -59,6 +56,7 @@ class Database(Layer):
     
     def setUp(self, args=None):
         print "Rebase MDB database root to temp directory"
+        super(MDBLayer, self).setUp(args)
         pyramid_zcml.zcml_configure('configure.zcml', 'cone.mdb')
         self.tempdir = tempfile.mkdtemp()
         self.db = root['settings']['database']
@@ -74,6 +72,7 @@ class Database(Layer):
     
     def tearDown(self):
         print "Reset to original MDB database path"
+        super(MDBLayer, self).tearDown()
         self.db.attrs.path = self.orgin_db_path
         self.db()
         shutil.rmtree(self.tempdir)
@@ -86,21 +85,7 @@ class Database(Layer):
         self.db.attrs.path = self.tempdir
         self.db()
     
-    # XXX: better way of providing stuff from base layer below
-    
-    @property
-    def security(self):
-        return security
-    
-    def login(self, login):
-        security.login(login)
-    
-    def logout(self):
-        security.logout()
-    
-    def new_request(self):
-        return security.new_request()
-    
-    @property
-    def current_request(self):
-        return security.current_request
+    def make_app(self):
+        super(MDBLayer, self).make_app(**{
+            'cone.plugins': 'node.ext.ugm\ncone.mdb',
+        })

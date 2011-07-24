@@ -44,7 +44,7 @@ Add::
     Traceback (most recent call last):
       ...
     Forbidden: Unauthorized: tile 
-    <cone.mdb.browser.repository.RepositoryAddForm object at ...> 
+    <cone.app.browser.authoring.AddTile object at ...> 
     failed permission check
     
     >>> layer.login('manager')

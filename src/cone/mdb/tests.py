@@ -9,13 +9,13 @@ optionflags = doctest.NORMALIZE_WHITESPACE | \
               doctest.ELLIPSIS | \
               doctest.REPORT_ONLY_FIRST_FAILURE
 
-layer = testing.Database()
+layer = testing.MDBLayer()
 
 TESTFILES = [
     'public.txt',
-#    'amqp.txt',
+##    'amqp.txt',
     'solr.txt', # XXX: this test resets solr index!!!
-#    'model/amqp.txt',
+##    'model/amqp.txt',
     'model/database.txt',
     'model/solr.txt',
     'model/repositories.txt',
@@ -23,7 +23,7 @@ TESTFILES = [
     'model/media.txt',
     'model/revision.txt',
     'model/utils.txt',
-#    'browser/amqp.txt',
+##    'browser/amqp.txt',
     'browser/database.txt',
     'browser/solr.txt',
     'browser/livesearch.txt',
