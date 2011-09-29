@@ -51,7 +51,7 @@ Add::
     >>> res = render_tile(repository, request, 'add')
     Traceback (most recent call last):
       ...
-    Forbidden: Unauthorized: tile 
+    HTTPForbidden: Unauthorized: tile 
     <cone.app.browser.authoring.AddTile object at ...> 
     failed permission check
     

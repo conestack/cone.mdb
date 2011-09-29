@@ -5,15 +5,15 @@ props:
     class: ajax
 widgets:
 - id:
-    factory: "mode:field:label:*valid_id:error:text"
+    factory: "field:label:*valid_id:error:text"
     props:
         label: Repository id
         required: No repository id given
-        mode: context.id_mode
     custom:
         valid_id:
             extractors:
                 - context.valid_id
+    mode: context.id_mode
 - title:
     factory: field:label:error:text
     value: expr:context.model.metadata.title

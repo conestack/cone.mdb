@@ -38,7 +38,7 @@ class RepositoryForm(object):
                                       'forms/repository.yaml')
     
     def id_mode(self, widget, data):
-        return self.action_resource == 'add' and 'edit' or None
+        return self.action_resource == 'add' and 'edit' or 'display'
     
     def valid_id(self, widget, data):
         id = self.request.params.get('repositoryform.id')

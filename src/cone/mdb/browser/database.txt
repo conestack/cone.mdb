@@ -14,7 +14,7 @@ Anonymous unauthorized::
     >>> res = render_tile(database, request, 'editform')
     Traceback (most recent call last):
       ...
-    Forbidden: Unauthorized: tile 
+    HTTPForbidden: Unauthorized: tile 
     <cone.mdb.browser.database.DatabaseSettingsForm object at ...> 
     failed permission check
 
@@ -24,7 +24,7 @@ Unprivileged unauthorized::
     >>> res = render_tile(database, request, 'editform')
     Traceback (most recent call last):
       ...
-    Forbidden: Unauthorized: tile 
+    HTTPForbidden: Unauthorized: tile 
     <cone.mdb.browser.database.DatabaseSettingsForm object at ...> 
     failed permission check
 
