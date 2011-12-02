@@ -39,16 +39,16 @@ Media
     
     >>> properties = media.properties
     >>> properties.keys()
-    ['action_list', 'referencable', 'editable', 
-    'action_view', 'action_up', 'in_navtree', 'deletable']
+    ['action_list', 'action_edit', 'action_add_reference', 'action_view', 
+    'action_up', 'action_delete', 'in_navtree']
     
     >>> properties.action_view
     True
     
-    >>> properties.editable
+    >>> properties.action_edit
     True
     
-    >>> properties.deletable
+    >>> properties.action_delete
     True
     
     >>> properties.in_navtree

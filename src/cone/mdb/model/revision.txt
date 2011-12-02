@@ -44,7 +44,7 @@ Revision
     >>> solr_md = SolrMetadata(config, SOLR_FIELDS, uid='1')
     >>> solr_md.query()
     >>> solr_md.keys()
-    ['uid', 'author', 'physical_path', 'created', 
+    ['uid', 'author', 'physical_path', 'created', 'state', 
     'path', 'size', 'type', 'revision']
     
     >>> solr_md.path
@@ -134,25 +134,22 @@ Revision
     >>> layer.login('owner')
     
     >>> revision.properties.keys()
-    ['wf_name', 'editable', 'wf_transition_names', 'action_view', 
-    'deletable', 'action_up', 'leaf', 'in_navtree', 'wf_state']
+    ['wf_name', 'action_edit', 'wf_transition_names', 'leaf', 'action_view', 
+    'action_up', 'action_delete', 'in_navtree']
     
     >>> revision.properties.action_view
     True
     
-    >>> revision.properties.editable
+    >>> revision.properties.action_edit
     True
     
-    >>> revision.properties.deletable
+    >>> revision.properties.action_delete
     True
     
     >>> revision.properties.in_navtree
     True
     
     >>> revision.properties.action_up
-    True
-    
-    >>> revision.properties.wf_state
     True
     
     >>> layer.login('max')

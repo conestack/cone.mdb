@@ -100,9 +100,9 @@ class MediaAdapter(AdapterNode):
     def properties(self):
         props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
         props.in_navtree = True
-        props.editable = True
-        props.deletable = True
-        props.referencable = True
+        props.action_edit = True
+        props.action_delete = True
+        props.action_add_reference = True
         props.action_up = True
         props.action_view = True
         props.action_list = True

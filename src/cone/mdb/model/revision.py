@@ -16,6 +16,7 @@ from cone.app.model import (
     NodeInfo,
     registerNodeInfo,
 )
+from cone.app.workflow import WorkflowState
 from cone.app.security import DEFAULT_NODE_PROPERTY_PERMISSIONS
 from node.ext.mdb import (
     Revision as MDBRevision,
@@ -107,7 +108,7 @@ def index_revision(revision):
     physical_path = '/'.join(nodepath(revision.model))
     try:
         size = os.path.getsize('%s.binary' % physical_path)
-    except OSError, e:
+    except OSError:
         size = 0
     body = ' '.join([
         revision.metadata.get('title', ''),
@@ -192,7 +193,7 @@ def update_revision(request, revision, data):
 
 class RevisionAdapter(AdapterNode):
     __metaclass__ = plumber
-    __plumbing__ = GroupToRepositoryACL
+    __plumbing__ = GroupToRepositoryACL, WorkflowState
     
     node_info_name = 'revision'
     
@@ -200,11 +201,10 @@ class RevisionAdapter(AdapterNode):
     def properties(self):
         props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
         props.in_navtree = True
-        props.editable = self.state == u'working_copy'
-        props.deletable = self.state == u'working_copy'
+        props.action_edit = self.state == u'working_copy'
+        props.action_delete = self.state == u'working_copy'
         props.action_up = True
         props.action_view = True
-        props.wf_state = True
         props.wf_name = u'revision'
         props.leaf = True
         # XXX: check in repoze.workflow the intended way for naming

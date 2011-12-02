@@ -75,8 +75,8 @@ class RepositoryAdapter(AdapterNode, DBLocation):
     def properties(self):
         props = ProtectedProperties(self, DEFAULT_NODE_PROPERTY_PERMISSIONS)
         props.in_navtree = True
-        props.editable = True
-        props.deletable = True
+        props.action_edit = True
+        props.action_delete = True
         props.action_up = True
         return props
     
